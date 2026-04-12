@@ -12,8 +12,8 @@ const Navbar = () => {
     return (
         <header className='w-9/12 mx-auto py-5 bg-transparent'>
             <nav className='w-full flex justify-between'>
-                <a href='#' className='text-2xl font-bold'>
-                    Ruhul <span>Amin</span>
+                <a href='#' className='text-2xl font-bold tracking-tight hover:text-(--color-primary)'>
+                    Ruhul Amin<span className='text-(--color-primary)'> .</span>
                 </a>
                 <ul className='flex justify-center items-center gap-5 text-lg font-medium'>
                     {NavLinks.map((link, index) => (
