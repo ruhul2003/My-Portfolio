@@ -7,8 +7,8 @@ const Banner = () => {
 
             <div className="max-w-7xl mx-auto w-full flex flex-col md:flex-row items-center gap-12">
 
-                {/* Image - smaller width, left aligned */}
-                <div className="w-full md:w-[35%] flex justify-center md:justify-start order-1">
+                {/* Image */}
+                <div className="w-full md:w-[35%] flex justify-center md:justify-start">
                     <img
                         src={profilePic}
                         alt="Profile"
@@ -16,8 +16,8 @@ const Banner = () => {
                     />
                 </div>
 
-                {/* Text - larger width */}
-                <div className="w-full md:w-[65%] space-y-6 text-center md:text-left order-2">
+                {/* Text */}
+                <div className="w-full md:w-[65%] space-y-6 text-center md:text-left">
 
                     <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-light tracking-tight leading-tight text-gray-400">
                         I am <span className="text-white font-medium">Web Developer</span>,  
@@ -29,7 +29,7 @@ const Banner = () => {
                     </p>
 
                     <div className="pt-2 flex justify-center md:justify-start">
-                        <button className="bg-[#D4FF00] text-black font-semibold px-6 sm:px-8 py-3 sm:py-4 rounded-full flex items-center gap-2 hover:bg-[#b8dd00] transition-colors duration-300">
+                        <button className="bg-[#D4FF00] text-black font-semibold px-6 sm:px-8 py-3 sm:py-4 rounded-full flex items-center gap-2 hover:bg-[#b8dd00] transition-colors">
                             Download CV
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
                                 viewBox="0 0 24 24" fill="none" stroke="currentColor"

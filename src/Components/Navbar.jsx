@@ -4,11 +4,12 @@ import { RiInstagramFill } from "react-icons/ri";
 import { HiMenu, HiX } from "react-icons/hi";
 
 const Navbar = () => {
-
     const [isOpen, setIsOpen] = useState(false);
 
     return (
-        <header className="w-full fixed top-0 left-0 z-50 backdrop-blur-lg bg-[#020617]/70">
+        <header className="w-full fixed top-0 left-0 z-50 
+                           bg-[#020617]/90 
+                           backdrop-blur-md">
 
             <nav className="w-11/12 md:w-9/12 mx-auto py-5 flex justify-between items-center text-white">
 
@@ -19,19 +20,19 @@ const Navbar = () => {
 
                 {/* Desktop Menu */}
                 <ul className="hidden md:flex gap-8 text-[16px]">
-                    <li className="hover:text-[#C4F000] cursor-pointer">Home</li>
-                    <li className="hover:text-[#C4F000] cursor-pointer">About</li>
-                    <li className="hover:text-[#C4F000] cursor-pointer">Projects</li>
-                    <li className="hover:text-[#C4F000] cursor-pointer">Blog</li>
-                    <li className="hover:text-[#C4F000] cursor-pointer">Contact</li>
+                    <li className="hover:text-[#C4F000] cursor-pointer transition-colors">Home</li>
+                    <li className="hover:text-[#C4F000] cursor-pointer transition-colors">About</li>
+                    <li className="hover:text-[#C4F000] cursor-pointer transition-colors">Projects</li>
+                    <li className="hover:text-[#C4F000] cursor-pointer transition-colors">Blog</li>
+                    <li className="hover:text-[#C4F000] cursor-pointer transition-colors">Contact</li>
                 </ul>
 
                 {/* Desktop Social */}
                 <div className="hidden md:flex gap-5 text-xl">
-                    <FaFacebook className="hover:text-[#C4F000] cursor-pointer" />
-                    <RiInstagramFill className="hover:text-[#C4F000] cursor-pointer" />
-                    <FaLinkedin className="hover:text-[#C4F000] cursor-pointer" />
-                    <FaGithub className="hover:text-[#C4F000] cursor-pointer" />
+                    <FaFacebook className="hover:text-[#C4F000] cursor-pointer transition-colors" />
+                    <RiInstagramFill className="hover:text-[#C4F000] cursor-pointer transition-colors" />
+                    <FaLinkedin className="hover:text-[#C4F000] cursor-pointer transition-colors" />
+                    <FaGithub className="hover:text-[#C4F000] cursor-pointer transition-colors" />
                 </div>
 
                 {/* Mobile Button */}
@@ -43,26 +44,25 @@ const Navbar = () => {
                 </div>
             </nav>
 
-            {/* Mobile Menu */}
-            <div className={`md:hidden bg-[#020617]/95 backdrop-blur-md text-white transition-all duration-300 
-                ${isOpen ? "max-h-[400px] py-6" : "max-h-0 overflow-hidden"}`}>
+            {/* Mobile Menu - Simplified (no max-height animation) */}
+            <div className={`md:hidden bg-[#020617]/95 backdrop-blur-sm text-white overflow-hidden transition-all duration-300 
+                ${isOpen ? "block py-6" : "hidden"}`}>
 
                 <ul className="flex flex-col items-center gap-6 text-lg">
-                    <li className="hover:text-[#C4F000] cursor-pointer">Home</li>
-                    <li className="hover:text-[#C4F000] cursor-pointer">About</li>
-                    <li className="hover:text-[#C4F000] cursor-pointer">Projects</li>
-                    <li className="hover:text-[#C4F000] cursor-pointer">Blog</li>
-                    <li className="hover:text-[#C4F000] cursor-pointer">Contact</li>
+                    <li className="hover:text-[#C4F000] cursor-pointer transition-colors">Home</li>
+                    <li className="hover:text-[#C4F000] cursor-pointer transition-colors">About</li>
+                    <li className="hover:text-[#C4F000] cursor-pointer transition-colors">Projects</li>
+                    <li className="hover:text-[#C4F000] cursor-pointer transition-colors">Blog</li>
+                    <li className="hover:text-[#C4F000] cursor-pointer transition-colors">Contact</li>
                 </ul>
 
                 <div className="flex justify-center gap-6 mt-6 text-2xl">
-                    <FaFacebook className="hover:text-[#C4F000] cursor-pointer" />
-                    <RiInstagramFill className="hover:text-[#C4F000] cursor-pointer" />
-                    <FaLinkedin className="hover:text-[#C4F000] cursor-pointer" />
-                    <FaGithub className="hover:text-[#C4F000] cursor-pointer" />
+                    <FaFacebook className="hover:text-[#C4F000] cursor-pointer transition-colors" />
+                    <RiInstagramFill className="hover:text-[#C4F000] cursor-pointer transition-colors" />
+                    <FaLinkedin className="hover:text-[#C4F000] cursor-pointer transition-colors" />
+                    <FaGithub className="hover:text-[#C4F000] cursor-pointer transition-colors" />
                 </div>
             </div>
-
         </header>
     );
 };
