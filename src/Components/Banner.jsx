@@ -1,5 +1,5 @@
 import React from 'react';
-import profilePic from "../assets/pp.jpeg";
+import profilePic from "../assets/pp.jpg";
 
 const Banner = () => {
     return (
@@ -12,7 +12,7 @@ const Banner = () => {
                     <img
                         src={profilePic}
                         alt="Profile"
-                        className="w-[240px] sm:w-[280px] md:w-[320px] lg:w-[360px] aspect-[4/5] object-cover rounded-[32px] border border-white/10 shadow-2xl"
+                        className="w-[240px] sm:w-[280px] md:w-[320px] lg:w-[360px] aspect-4/5 object-cover rounded-[32px] border border-white/10 shadow-2xl"
                     />
                 </div>
 
