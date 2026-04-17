@@ -1,8 +1,6 @@
-import Navbar from "./Layout/Navbar"
-import About from "./Sections/About"
-import Projects from "./Sections/Projects"
-import Testimonials from "./Sections/Testimonials"
-import Contact from "./Sections/Contact"
+import Banner from "./Components/Banner"
+import Navbar from "./Components/Navbar"
+
 
 function App() {
   
@@ -10,7 +8,7 @@ function App() {
   return (
     <div className="min-h-screen overflow-x-hidden">
       <Navbar />
-
+      <Banner />
       <main>
         
       </main>
