@@ -6,6 +6,7 @@ import Education from './Components/Education';
 import Services from './Components/Services';
 import Footer from './Components/Footer';
 import Projects from './Components/Projects';
+import Contact from './Components/Contact';
 function App() {
   return (
     <div className="min-h-screen overflow-hidden no-scrollbar">
@@ -17,6 +18,7 @@ function App() {
         <Education />
         <Services />
         <Projects />
+        <Contact />
         <Footer />
       </main>
     </div>
