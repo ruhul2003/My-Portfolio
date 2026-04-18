@@ -5,7 +5,7 @@ const About = () => {
     return (
         <div className='w-9/12 mt-10 mx-auto'>
             <h1 className="text-4xl md:text-6xl lg:text-[80px]  font-extrabold text-[#B3B3B3]">About Me</h1>
-            <p className='text-[#B4B4B4] mt-10 ml-10 text-[20px]'>With over 2 years of dedicated focus on developing web applications that achieve business goals, <br /> I have established myself as a trusted professional in the industry.</p>
+            <p className='text-[#B4B4B4] mt-10 ml-10 text-[20px]'>With over 2 years of dedicated focus on developing web applications that achieve business goals, I have established myself as a trusted professional in the industry.</p>
 
             {/* Counters */}
 

@@ -7,7 +7,7 @@ import { FaDatabase } from "react-icons/fa";
 
 const Services = () => {
     return (
-        <div className="min-h-screen w-9/12 mx-auto ">
+        <div className="w-9/12 mb-10 mx-auto ">
             <div className='py-25 w-full'>
                 <div className='w-full mx-auto'>
                     <h1 className="text-4xl md:text-6xl lg:text-[80px] font-bold text-[#B3B3B3]">
@@ -21,7 +21,7 @@ const Services = () => {
 
             {/* cards */}
 
-            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5'>
+            <div className='flex flex-wrap gap-5'>
 
                 <div className='w-[400px] bg-zinc-950 mx-auto px-7 py-8 rounded-lg border border-transparent hover:border-[#D4FF00] transition-all duration-300'>
                     <TbBrandAirtable className='w-[55px] h-[55px] text-[#D4FF00]' />

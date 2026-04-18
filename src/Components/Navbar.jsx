@@ -8,8 +8,8 @@ const Navbar = () => {
 
     return (
         <header className="w-full fixed top-0 left-0 z-50 
-                           bg-[#020617]/90 
-                           backdrop-blur-md">
+                           bg-[#020617]/70 
+                           backdrop-blur-sm">
 
             <nav className="w-11/12 md:w-9/12 mx-auto py-5 flex justify-between items-center text-white">
 
