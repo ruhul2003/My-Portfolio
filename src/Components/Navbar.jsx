@@ -23,7 +23,7 @@ const Navbar = () => {
                     <li className="hover:text-[#C4F000] cursor-pointer transition-colors">Home</li>
                     <li className="hover:text-[#C4F000] cursor-pointer transition-colors">About</li>
                     <li className="hover:text-[#C4F000] cursor-pointer transition-colors">Projects</li>
-                    <li className="hover:text-[#C4F000] cursor-pointer transition-colors">Blog</li>
+                    <li className="hover:text-[#C4F000] cursor-pointer transition-colors">Services</li>
                     <li className="hover:text-[#C4F000] cursor-pointer transition-colors">Contact</li>
                 </ul>
 

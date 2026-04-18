@@ -25,7 +25,7 @@ const Banner = () => {
                     </h1>
 
                     <p className="text-gray-500 text-base sm:text-lg md:text-xl font-light max-w-2xl mx-auto md:mx-0 leading-relaxed">
-                        Hi, I'm Stefeny — I'm a freelance product designer with 12+ years of experience focusing on app interfaces.
+                        Hi, I'm Ruhul Amin — I'm a full stack Web developer with 2+ years of experience focusing on app interfaces.
                     </p>
 
                     <div className="pt-2 flex justify-center md:justify-start">
