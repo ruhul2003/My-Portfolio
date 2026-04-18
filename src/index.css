@@ -1,22 +1,29 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
-/* Only essential performance-friendly styles */
+
 html {
   scroll-behavior: smooth;
 }
 
-/* Remove backface and will-change (they can cause issues on mobile) */
-header {
-  /* No backface-visibility or will-change */
+body{ background: linear-gradient(to right, 
+  #050505, 
+  #0f0f1e, 
+  #1e1b4b
+);
+;
 }
 
-@layer utilities {
-  .no-scrollbar {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
 
-  .no-scrollbar::-webkit-scrollbar {
-    display: none;
+#cursor > div:first-child {
+  transition: transform 0.25s ease, border-color 0.3s ease;
+}
+
+
+
+/* Make Inter the default font for the whole site */
+@layer base {
+  html, body {
+    font-family: 'Inter', system-ui, sans-serif;
   }
 }
