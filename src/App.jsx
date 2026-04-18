@@ -5,6 +5,7 @@ import About from './Components/About';
 import Education from './Components/Education';
 import Services from './Components/Services';
 import Footer from './Components/Footer';
+import Projects from './Components/Projects';
 function App() {
   return (
     <div className="min-h-screen overflow-hidden no-scrollbar">
@@ -15,6 +16,7 @@ function App() {
         <About />
         <Education />
         <Services />
+        <Projects />
         <Footer />
       </main>
     </div>
