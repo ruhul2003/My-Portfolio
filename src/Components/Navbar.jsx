@@ -1,10 +1,18 @@
 import React, { useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';   // ← Added
 import { FaFacebook, FaLinkedin, FaGithub } from "react-icons/fa";
 import { RiInstagramFill } from "react-icons/ri";
 import { HiMenu, HiX } from "react-icons/hi";
 
 const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false);
+    const location = useLocation();   // ← For active link highlighting
+
+    // Helper function to check active route
+    const isActive = (path) => {
+        if (path === '/') return location.pathname === '/';
+        return location.pathname.startsWith(path);
+    };
 
     return (
         <header className="w-full fixed top-0 left-0 z-50 
@@ -13,18 +21,58 @@ const Navbar = () => {
 
             <nav className="w-11/12 md:w-9/12 mx-auto py-5 flex justify-between items-center text-white">
 
-                {/* Logo */}
-                <h1 className="text-3xl md:text-4xl font-extrabold text-[#C4F000]">
+                {/* Logo - Link to Home */}
+                <Link to="/" className="text-3xl md:text-4xl font-extrabold text-[#C4F000]">
                     Ruhul.
-                </h1>
+                </Link>
 
                 {/* Desktop Menu */}
                 <ul className="hidden md:flex gap-8 text-[16px]">
-                    <li className="hover:text-[#C4F000] cursor-pointer transition-colors">Home</li>
-                    <li className="hover:text-[#C4F000] cursor-pointer transition-colors">About</li>
-                    <li className="hover:text-[#C4F000] cursor-pointer transition-colors">Projects</li>
-                    <li className="hover:text-[#C4F000] cursor-pointer transition-colors">Services</li>
-                    <li className="hover:text-[#C4F000] cursor-pointer transition-colors">Contact</li>
+                    <li>
+                        <Link 
+                            to="/" 
+                            className={`hover:text-[#C4F000] cursor-pointer transition-colors 
+                                ${isActive('/') ? 'text-[#C4F000]' : ''}`}
+                        >
+                            Home
+                        </Link>
+                    </li>
+                    <li>
+                        <Link 
+                            to="/about" 
+                            className={`hover:text-[#C4F000] cursor-pointer transition-colors 
+                                ${isActive('/about') ? 'text-[#C4F000]' : ''}`}
+                        >
+                            About
+                        </Link>
+                    </li>
+                    <li>
+                        <Link 
+                            to="/projects" 
+                            className={`hover:text-[#C4F000] cursor-pointer transition-colors 
+                                ${isActive('/projects') ? 'text-[#C4F000]' : ''}`}
+                        >
+                            Projects
+                        </Link>
+                    </li>
+                    <li>
+                        <Link 
+                            to="/services" 
+                            className={`hover:text-[#C4F000] cursor-pointer transition-colors 
+                                ${isActive('/services') ? 'text-[#C4F000]' : ''}`}
+                        >
+                            Services
+                        </Link>
+                    </li>
+                    <li>
+                        <Link 
+                            to="/contact" 
+                            className={`hover:text-[#C4F000] cursor-pointer transition-colors 
+                                ${isActive('/contact') ? 'text-[#C4F000]' : ''}`}
+                        >
+                            Contact
+                        </Link>
+                    </li>
                 </ul>
 
                 {/* Desktop Social */}
@@ -44,16 +92,61 @@ const Navbar = () => {
                 </div>
             </nav>
 
-            {/* Mobile Menu - Simplified (no max-height animation) */}
+            {/* Mobile Menu */}
             <div className={`md:hidden bg-[#020617]/95 backdrop-blur-sm text-white overflow-hidden transition-all duration-300 
                 ${isOpen ? "block py-6" : "hidden"}`}>
 
                 <ul className="flex flex-col items-center gap-6 text-lg">
-                    <li className="hover:text-[#C4F000] cursor-pointer transition-colors">Home</li>
-                    <li className="hover:text-[#C4F000] cursor-pointer transition-colors">About</li>
-                    <li className="hover:text-[#C4F000] cursor-pointer transition-colors">Projects</li>
-                    <li className="hover:text-[#C4F000] cursor-pointer transition-colors">Blog</li>
-                    <li className="hover:text-[#C4F000] cursor-pointer transition-colors">Contact</li>
+                    <li>
+                        <Link 
+                            to="/" 
+                            className={`hover:text-[#C4F000] cursor-pointer transition-colors 
+                                ${isActive('/') ? 'text-[#C4F000]' : ''}`}
+                            onClick={() => setIsOpen(false)}
+                        >
+                            Home
+                        </Link>
+                    </li>
+                    <li>
+                        <Link 
+                            to="/about" 
+                            className={`hover:text-[#C4F000] cursor-pointer transition-colors 
+                                ${isActive('/about') ? 'text-[#C4F000]' : ''}`}
+                            onClick={() => setIsOpen(false)}
+                        >
+                            About
+                        </Link>
+                    </li>
+                    <li>
+                        <Link 
+                            to="/projects" 
+                            className={`hover:text-[#C4F000] cursor-pointer transition-colors 
+                                ${isActive('/projects') ? 'text-[#C4F000]' : ''}`}
+                            onClick={() => setIsOpen(false)}
+                        >
+                            Projects
+                        </Link>
+                    </li>
+                    <li>
+                        <Link 
+                            to="/services" 
+                            className={`hover:text-[#C4F000] cursor-pointer transition-colors 
+                                ${isActive('/services') ? 'text-[#C4F000]' : ''}`}
+                            onClick={() => setIsOpen(false)}
+                        >
+                            Services
+                        </Link>
+                    </li>
+                    <li>
+                        <Link 
+                            to="/contact" 
+                            className={`hover:text-[#C4F000] cursor-pointer transition-colors 
+                                ${isActive('/contact') ? 'text-[#C4F000]' : ''}`}
+                            onClick={() => setIsOpen(false)}
+                        >
+                            Contact
+                        </Link>
+                    </li>
                 </ul>
 
                 <div className="flex justify-center gap-6 mt-6 text-2xl">

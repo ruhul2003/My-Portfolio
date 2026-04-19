@@ -1,28 +1,44 @@
-import React from 'react';
-import Navbar from './Components/Navbar';
-import Banner from './Components/Banner';
-import About from './Components/About';
-import Education from './Components/Education';
-import Services from './Components/Services';
-import Footer from './Components/Footer';
-import Projects from './Components/Projects';
-import Contact from './Components/Contact';
-function App() {
-  return (
-    <div className="min-h-screen overflow-hidden no-scrollbar">
-      <Navbar />
+// src/App.jsx
+import { RouterProvider, createBrowserRouter } from 'react-router-dom';
+import Layout from './Components/Layout';
 
-      <main >  
-        <Banner />
-        <About />
-        <Education />
-        <Services />
-        <Projects />
-        <Contact />
-        <Footer />
-      </main>
-    </div>
-  );
+// Import Pages
+import Home from './pages/Home';
+import AboutPage from './pages/AboutPage';
+import ProjectsPage from './pages/ProjectsPage';
+import ContactPage from './pages/ContactPage';
+
+const router = createBrowserRouter([
+  {
+    path: '/',
+    element: <Layout />,           // Fixed layout with Navbar + Footer
+    children: [
+      {
+        index: true,
+        element: <Home />,
+      },
+      {
+        path: 'about',
+        element: <AboutPage />,
+      },
+      {
+        path: 'projects',
+        element: <ProjectsPage />,
+      },
+      {
+        path: 'contact',
+        element: <ContactPage />,
+      },
+      {
+        path: '*',
+        element: <h1 className="text-4xl text-center py-32">404 - Page Not Found</h1>,
+      },
+    ],
+  },
+]);
+
+function App() {
+  return <RouterProvider router={router} />;
 }
 
 export default App;
