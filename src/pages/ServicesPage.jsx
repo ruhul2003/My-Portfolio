@@ -1,10 +1,13 @@
 // src/pages/ServicesPage.jsx
 import Services from '../Components/Services';
+import AnimatedSection from '../Components/AnimatedSection';
 
 const ServicesPage = () => {
   return (
-    <div className="pt-8 pb-16">   {/* pt-20 to push content below fixed navbar */}
-      <Services />
+    <div className="pb-16">
+      <AnimatedSection direction="right">
+        <Services />
+      </AnimatedSection>
     </div>
   );
 };

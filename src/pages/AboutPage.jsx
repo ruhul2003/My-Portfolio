@@ -1,11 +1,18 @@
+// src/pages/AboutPage.jsx
 import About from '../Components/About';
 import Education from '../Components/Education';
+import AnimatedSection from '../Components/AnimatedSection';
 
 const AboutPage = () => {
   return (
-    <div className="pt-8 pb-10">
-      <About />
-      <Education />
+    <div className="pb-16 space-y-20">
+      <AnimatedSection direction="left">
+        <About />
+      </AnimatedSection>
+
+      <AnimatedSection direction="right" delay={0.2}>
+        <Education />
+      </AnimatedSection>
     </div>
   );
 };

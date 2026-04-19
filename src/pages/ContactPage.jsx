@@ -1,9 +1,13 @@
+// src/pages/ContactPage.jsx
 import Contact from '../Components/Contact';
+import AnimatedSection from '../Components/AnimatedSection';
 
 const ContactPage = () => {
   return (
-    <div className="pt-8 pb-10">
-      <Contact />
+    <div className="pb-16">
+      <AnimatedSection direction="up">
+        <Contact />
+      </AnimatedSection>
     </div>
   );
 };
