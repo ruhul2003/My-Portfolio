@@ -3,7 +3,7 @@ import profilePic from "../assets/pp.jpg";
 
 const Banner = () => {
     return (
-        <section className="min-h-screen sm:min-h-fit overflow-hidden w-full flex items-center  text-white px-6 sm:px-12 md:px-20">
+        <section className="min-h-screen  overflow-hidden w-full flex items-center  text-white px-6 sm:px-12 md:px-20">
 
             <div className="max-w-7xl mx-auto w-full flex flex-col md:flex-row items-center gap-12">
 
