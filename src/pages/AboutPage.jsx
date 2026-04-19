@@ -3,7 +3,7 @@ import Education from '../Components/Education';
 
 const AboutPage = () => {
   return (
-    <div className="pt-20 pb-10">
+    <div className="pt-8 pb-10">
       <About />
       <Education />
     </div>
