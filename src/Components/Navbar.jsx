@@ -77,7 +77,7 @@ const Navbar = () => {
 
                 {/* Desktop Social */}
                 <div className="hidden md:flex gap-5 text-xl">
-                    <FaFacebook className="hover:text-[#C4F000] cursor-pointer transition-colors" />
+                    <FaFacebook href='https://www.facebook.com/imtiaz.hossain.908347' className="hover:text-[#C4F000] cursor-pointer transition-colors" />
                     <RiInstagramFill className="hover:text-[#C4F000] cursor-pointer transition-colors" />
                     <FaLinkedin className="hover:text-[#C4F000] cursor-pointer transition-colors" />
                     <FaGithub className="hover:text-[#C4F000] cursor-pointer transition-colors" />
