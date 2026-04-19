@@ -6,12 +6,13 @@ import Layout from './Components/Layout';
 import Home from './pages/Home';
 import AboutPage from './pages/AboutPage';
 import ProjectsPage from './pages/ProjectsPage';
+import ServicesPage from './pages/ServicesPage';   // ← New
 import ContactPage from './pages/ContactPage';
 
 const router = createBrowserRouter([
   {
     path: '/',
-    element: <Layout />,           // Fixed layout with Navbar + Footer
+    element: <Layout />,
     children: [
       {
         index: true,
@@ -26,12 +27,21 @@ const router = createBrowserRouter([
         element: <ProjectsPage />,
       },
       {
+        path: 'services',           // ← This fixes the 404
+        element: <ServicesPage />,
+      },
+      {
         path: 'contact',
         element: <ContactPage />,
       },
       {
         path: '*',
-        element: <h1 className="text-4xl text-center py-32">404 - Page Not Found</h1>,
+        element: (
+          <div className="text-center py-32 text-white">
+            <h1 className="text-5xl font-bold mb-4">404</h1>
+            <p className="text-xl">Page Not Found</p>
+          </div>
+        ),
       },
     ],
   },
