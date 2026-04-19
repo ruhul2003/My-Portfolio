@@ -29,8 +29,8 @@ const Navbar = () => {
                 {/* Desktop Menu */}
                 <ul className="hidden md:flex gap-8 text-[16px]">
                     <li>
-                        <Link 
-                            to="/" 
+                        <Link
+                            to="/"
                             className={`hover:text-[#C4F000] cursor-pointer transition-colors 
                                 ${isActive('/') ? 'text-[#C4F000]' : ''}`}
                         >
@@ -38,8 +38,8 @@ const Navbar = () => {
                         </Link>
                     </li>
                     <li>
-                        <Link 
-                            to="/about" 
+                        <Link
+                            to="/about"
                             className={`hover:text-[#C4F000] cursor-pointer transition-colors 
                                 ${isActive('/about') ? 'text-[#C4F000]' : ''}`}
                         >
@@ -47,8 +47,8 @@ const Navbar = () => {
                         </Link>
                     </li>
                     <li>
-                        <Link 
-                            to="/projects" 
+                        <Link
+                            to="/projects"
                             className={`hover:text-[#C4F000] cursor-pointer transition-colors 
                                 ${isActive('/projects') ? 'text-[#C4F000]' : ''}`}
                         >
@@ -56,8 +56,8 @@ const Navbar = () => {
                         </Link>
                     </li>
                     <li>
-                        <Link 
-                            to="/services" 
+                        <Link
+                            to="/services"
                             className={`hover:text-[#C4F000] cursor-pointer transition-colors 
                                 ${isActive('/services') ? 'text-[#C4F000]' : ''}`}
                         >
@@ -65,8 +65,8 @@ const Navbar = () => {
                         </Link>
                     </li>
                     <li>
-                        <Link 
-                            to="/contact" 
+                        <Link
+                            to="/contact"
                             className={`hover:text-[#C4F000] cursor-pointer transition-colors 
                                 ${isActive('/contact') ? 'text-[#C4F000]' : ''}`}
                         >
@@ -77,10 +77,39 @@ const Navbar = () => {
 
                 {/* Desktop Social */}
                 <div className="hidden md:flex gap-5 text-xl">
-                    <FaFacebook href='https://www.facebook.com/imtiaz.hossain.908347' className="hover:text-[#C4F000] cursor-pointer transition-colors" />
-                    <RiInstagramFill className="hover:text-[#C4F000] cursor-pointer transition-colors" />
-                    <FaLinkedin className="hover:text-[#C4F000] cursor-pointer transition-colors" />
-                    <FaGithub className="hover:text-[#C4F000] cursor-pointer transition-colors" />
+
+                    <a
+                        href="https://www.facebook.com/imtiaz.hossain.908347"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        <FaFacebook className="hover:text-[#C4F000] cursor-pointer transition-colors" />
+                    </a>
+
+                    <a
+                        href="https://www.instagram.com/your_imtiaz_27/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        <RiInstagramFill className="hover:text-[#C4F000] cursor-pointer transition-colors" />
+                    </a>
+
+                    <a
+                        href="https://www.linkedin.com/in/ruhul-amin-web-dev/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        <FaLinkedin className="hover:text-[#C4F000] cursor-pointer transition-colors" />
+                    </a>
+
+                    <a
+                        href="https://github.com/ruhul2003"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        <FaGithub className="hover:text-[#C4F000] cursor-pointer transition-colors" />
+                    </a>
+
                 </div>
 
                 {/* Mobile Button */}
@@ -98,8 +127,8 @@ const Navbar = () => {
 
                 <ul className="flex flex-col items-center gap-6 text-lg">
                     <li>
-                        <Link 
-                            to="/" 
+                        <Link
+                            to="/"
                             className={`hover:text-[#C4F000] cursor-pointer transition-colors 
                                 ${isActive('/') ? 'text-[#C4F000]' : ''}`}
                             onClick={() => setIsOpen(false)}
@@ -108,8 +137,8 @@ const Navbar = () => {
                         </Link>
                     </li>
                     <li>
-                        <Link 
-                            to="/about" 
+                        <Link
+                            to="/about"
                             className={`hover:text-[#C4F000] cursor-pointer transition-colors 
                                 ${isActive('/about') ? 'text-[#C4F000]' : ''}`}
                             onClick={() => setIsOpen(false)}
@@ -118,8 +147,8 @@ const Navbar = () => {
                         </Link>
                     </li>
                     <li>
-                        <Link 
-                            to="/projects" 
+                        <Link
+                            to="/projects"
                             className={`hover:text-[#C4F000] cursor-pointer transition-colors 
                                 ${isActive('/projects') ? 'text-[#C4F000]' : ''}`}
                             onClick={() => setIsOpen(false)}
@@ -128,8 +157,8 @@ const Navbar = () => {
                         </Link>
                     </li>
                     <li>
-                        <Link 
-                            to="/services" 
+                        <Link
+                            to="/services"
                             className={`hover:text-[#C4F000] cursor-pointer transition-colors 
                                 ${isActive('/services') ? 'text-[#C4F000]' : ''}`}
                             onClick={() => setIsOpen(false)}
@@ -138,8 +167,8 @@ const Navbar = () => {
                         </Link>
                     </li>
                     <li>
-                        <Link 
-                            to="/contact" 
+                        <Link
+                            to="/contact"
                             className={`hover:text-[#C4F000] cursor-pointer transition-colors 
                                 ${isActive('/contact') ? 'text-[#C4F000]' : ''}`}
                             onClick={() => setIsOpen(false)}
