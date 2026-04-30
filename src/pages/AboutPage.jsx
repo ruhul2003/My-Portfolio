@@ -2,6 +2,7 @@
 import About from '../Components/About';
 import Education from '../Components/Education';
 import AnimatedSection from '../Components/AnimatedSection';
+import TechStack from '../Components/TechStack';
 
 const AboutPage = () => {
   return (
@@ -12,6 +13,10 @@ const AboutPage = () => {
 
       <AnimatedSection direction="right" delay={0.2}>
         <Education />
+      </AnimatedSection>
+
+      <AnimatedSection direction="left" delay={0.4}>
+        <TechStack />
       </AnimatedSection>
     </div>
   );
