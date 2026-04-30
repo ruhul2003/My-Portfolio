@@ -27,7 +27,7 @@ const router = createBrowserRouter([
         element: <ProjectsPage />,
       },
       {
-        path: 'services',           // ← This fixes the 404
+        path: 'services',
         element: <ServicesPage />,
       },
       {
