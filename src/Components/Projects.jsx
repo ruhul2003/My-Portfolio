@@ -3,37 +3,46 @@ import P1 from "../assets/p1.png";
 import P2 from "../assets/p2.png";
 import P3 from "../assets/p3.png";
 import P4 from "../assets/p4.png";
+import P5 from "../assets/p5.png";
 
 const Projects = () => {
     const projects = [
         {
             id: 1,
-            image: P1,
-            title: "Keen Keeper",
-            description: "A brief description of this amazing project and what I delivered.",
-            link: "#", // Replace with actual link
+            image: P5,
+            title: "Tilux",
+            description: "Tilux is a modern marble and tiles showcase web application built with Next.js",
+            link: "https://tilux.vercel.app",
         },
         {
             id: 2,
-            image: P2,
-            title: "DigiTools",
-            description: "Another standout project showcasing modern design and functionality.",
-            link: "#",
+            image: P1,
+            title: "Keen Keeper",
+            description: "A brief description of this amazing project and what I delivered.",
+            link: "https://keen-keeper-tau-rosy.vercel.app",
         },
         {
             id: 3,
+            image: P2,
+            title: "DigiTools",
+            description: "Another standout project showcasing modern design and functionality.",
+            link: "https://digi-tools-platform-git-ruhul-ruhul-amin1.vercel.app",
+        },
+        {
+            id: 4,
             image: P3,
             title: "English Janala",
             description: "High-quality solution delivered to a client with great results.",
             link: "#",
         },
         {
-            id: 4,
+            id: 5,
             image: P4,
             title: "Github Issue Tracker",
             description: "Community-focused project that I'm really proud of.",
-            link: "#",
+            link: "https://github-issues-tracker-plum.vercel.app",
         },
+        
     ];
 
     return (
