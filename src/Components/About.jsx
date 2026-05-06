@@ -43,7 +43,7 @@ const About = () => {
                     <img
                         src={profilePic}
                         alt="Profile"
-                        className="w-full aspect-[4/5] object-cover rounded-xl border border-white/10 shadow-2xl"
+                        className="w-full aspect-4/5 object-cover rounded-xl border border-white/10 shadow-2xl"
                     />
                 </div>
 
