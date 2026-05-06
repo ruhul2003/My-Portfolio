@@ -15,9 +15,7 @@ const AboutPage = () => {
         <Education />
       </AnimatedSection>
 
-      <AnimatedSection direction="left" delay={0.4}>
-        <TechStack />
-      </AnimatedSection>
+      
     </div>
   );
 };
