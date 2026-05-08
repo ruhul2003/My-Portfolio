@@ -1,7 +1,9 @@
 import React from 'react';
 
+
 const Contact = () => {
     return (
+        
         <div>
             <div className="w-9/12 mb-10 mx-auto ">
                 <div className='py-25 w-full'>
