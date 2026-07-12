@@ -22,35 +22,55 @@ const defaultProjects = [
     title: "Tilux",
     description: "Tilux is a modern marble and tiles showcase web application built with Next.js",
     link: "https://tilux.vercel.app",
-    images: ["/assets/p5.png", "/assets/p5.png", "/assets/p5.png"],
+    images: [
+      { url: "/assets/p5.png", title: "Landing Page" },
+      { url: "/assets/p5.png", title: "Product Categories" },
+      { url: "/assets/p5.png", title: "Interactive Product Showcase" }
+    ],
     technologies: ["Next.js", "React", "Tailwind CSS", "MongoDB"],
   },
   {
     title: "Keen Keeper",
     description: "A brief description of this amazing project and what I delivered.",
     link: "https://keen-keeper-tau-rosy.vercel.app",
-    images: ["/assets/p1.png", "/assets/p1.png", "/assets/p1.png"],
+    images: [
+      { url: "/assets/p1.png", title: "Task Dashboard" },
+      { url: "/assets/p1.png", title: "Sprint View" },
+      { url: "/assets/p1.png", title: "Collaborators Panel" }
+    ],
     technologies: ["React", "Vite", "Tailwind CSS"],
   },
   {
     title: "DigiTools",
     description: "Another standout project showcasing modern design and functionality.",
     link: "https://digi-tools-platform-git-ruhul-ruhul-amin1.vercel.app",
-    images: ["/assets/p2.png", "/assets/p2.png", "/assets/p2.png"],
+    images: [
+      { url: "/assets/p2.png", title: "Product Catalog" },
+      { url: "/assets/p2.png", title: "Shopping Cart" },
+      { url: "/assets/p2.png", title: "Stripe Checkout" }
+    ],
     technologies: ["React", "Tailwind CSS", "Node.js"],
   },
   {
     title: "English Janala",
     description: "High-quality solution delivered to a client with great results.",
     link: "https://english-janala.vercel.app",
-    images: ["/assets/p3.png", "/assets/p3.png", "/assets/p3.png"],
+    images: [
+      { url: "/assets/p3.png", title: "Online Portal Homepage" },
+      { url: "/assets/p3.png", title: "Course Content Grid" },
+      { url: "/assets/p3.png", title: "Student Progress Tracker" }
+    ],
     technologies: ["React", "Tailwind CSS", "Express"],
   },
   {
     title: "Github Issue Tracker",
     description: "Community-focused project that I'm really proud of.",
     link: "https://github-issues-tracker-plum.vercel.app",
-    images: ["/assets/p4.png", "/assets/p4.png", "/assets/p4.png"],
+    images: [
+      { url: "/assets/p4.png", title: "Active Issues Dashboard" },
+      { url: "/assets/p4.png", title: "Issue Filter Grid" },
+      { url: "/assets/p4.png", title: "New Issue Submission Form" }
+    ],
     technologies: ["React", "Tailwind CSS", "Vite"],
   },
 ];
@@ -63,6 +83,13 @@ export async function GET() {
     await dbConnect();
     let projects = await Project.find({}).sort({ createdAt: -1 });
     
+    // Self-healing check: Convert old string array format to object format
+    if (projects.length > 0 && projects[0].images && projects[0].images[0] && typeof projects[0].images[0] === 'string') {
+      await Project.deleteMany({});
+      await SystemSetting.deleteOne({ key: 'seeded_projects' });
+      projects = [];
+    }
+
     // Seed default projects if never seeded before
     const hasSeeded = await SystemSetting.findOne({ key: 'seeded_projects' });
     if (projects.length === 0 && !hasSeeded) {

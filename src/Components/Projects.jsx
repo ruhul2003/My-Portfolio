@@ -133,7 +133,7 @@ const Projects = () => {
                                     {/* Image Container */}
                                     <div className="relative aspect-16/10 overflow-hidden bg-black/40">
                                         <img
-                                            src={project.images && project.images[0] ? project.images[0] : "/assets/p1.png"}
+                                            src={project.images && project.images[0] ? (project.images[0].url || project.images[0]) : "/assets/p1.png"}
                                             alt={project.title}
                                             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                                         />
@@ -239,7 +239,7 @@ const Projects = () => {
                                     <AnimatePresence mode="wait">
                                         <motion.img
                                             key={currentImgIndex}
-                                            src={selectedProject.images[currentImgIndex]}
+                                            src={selectedProject.images[currentImgIndex]?.url || selectedProject.images[currentImgIndex]}
                                             alt={`${selectedProject.title} screenshot ${currentImgIndex + 1}`}
                                             initial={{ opacity: 0, x: 50 }}
                                             animate={{ opacity: 1, x: 0 }}
@@ -249,24 +249,29 @@ const Projects = () => {
                                         />
                                     </AnimatePresence>
 
+                                    {/* Image Caption overlay */}
+                                    <div className="absolute bottom-3 left-1/2 -translate-x-1/2 bg-black/75 backdrop-blur-sm border border-zinc-800 text-[10px] sm:text-xs font-semibold text-gray-200 px-4 py-1.5 rounded-full z-20 shadow-md max-w-[80%] text-center truncate">
+                                        {selectedProject.images[currentImgIndex]?.title || `Screenshot ${currentImgIndex + 1}`}
+                                    </div>
+
                                     {/* Carousel navigation buttons */}
                                     {selectedProject.images.length > 1 && (
                                         <>
                                             <button
                                                 onClick={(e) => { e.stopPropagation(); prevImage(); }}
-                                                className="absolute left-4 p-3 bg-black/60 hover:bg-black/90 text-white rounded-full transition-all border border-zinc-800 hover:scale-105"
+                                                className="absolute left-4 p-3 bg-black/60 hover:bg-black/90 text-white rounded-full transition-all border border-zinc-855 hover:scale-105"
                                             >
                                                 <FaChevronLeft />
                                             </button>
                                             <button
                                                 onClick={(e) => { e.stopPropagation(); nextImage(); }}
-                                                className="absolute right-4 p-3 bg-black/60 hover:bg-black/90 text-white rounded-full transition-all border border-zinc-800 hover:scale-105"
+                                                className="absolute right-4 p-3 bg-black/60 hover:bg-black/90 text-white rounded-full transition-all border border-zinc-855 hover:scale-105"
                                             >
                                                 <FaChevronRight />
                                             </button>
 
                                             {/* Dot indicators */}
-                                            <div className="absolute bottom-4 flex gap-1.5 z-20">
+                                            <div className="absolute bottom-10 flex gap-1.5 z-20">
                                                 {selectedProject.images.map((_, idx) => (
                                                     <button
                                                         key={idx}

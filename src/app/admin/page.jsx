@@ -241,12 +241,17 @@ function AdminDashboardContent() {
         for (let file of files) {
             try {
                 const compressed = await compressImage(file);
-                compressedList.push(compressed);
+                // Push as object with url and empty title initially
+                compressedList.push({ url: compressed, title: '' });
             } catch (err) {
                 setFormError("Failed to process one or more images.");
             }
         }
         setImages(prev => [...prev, ...compressedList]);
+    };
+
+    const updateImageTitle = (index, titleText) => {
+        setImages(prev => prev.map((img, idx) => idx === index ? { ...img, title: titleText } : img));
     };
 
     const removeImage = (index) => {
@@ -532,7 +537,7 @@ function AdminDashboardContent() {
                                         <div key={project._id} className="bg-zinc-900/40 border border-zinc-850 rounded-2xl p-5 flex flex-col justify-between hover:border-zinc-700 transition-all duration-300 shadow-md group">
                                             <div>
                                                 <div className="relative aspect-video rounded-xl overflow-hidden mb-4 bg-black/40 border border-zinc-800">
-                                                    <img src={project.images[0] || "/assets/p1.png"} alt={project.title} className="w-full h-full object-cover" />
+                                                    <img src={project.images[0]?.url || project.images[0] || "/assets/p1.png"} alt={project.title} className="w-full h-full object-cover" />
                                                     <div className="absolute top-2 right-2 bg-black/80 backdrop-blur-sm border border-zinc-800 text-[11px] font-semibold text-gray-300 px-2 py-0.5 rounded-full">
                                                         {project.images.length} Images
                                                     </div>
@@ -686,11 +691,21 @@ function AdminDashboardContent() {
                                                 </div>
                                             )}
                                             {images.length > 0 && (
-                                                <div className="grid grid-cols-3 sm:grid-cols-5 gap-3.5 mt-2">
+                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2">
                                                     {images.map((img, idx) => (
-                                                        <div key={idx} className="relative aspect-video rounded-lg overflow-hidden bg-black/60 border border-zinc-850 group/img">
-                                                            <img src={img} alt="preview" className="w-full h-full object-cover" />
-                                                            <button type="button" onClick={() => removeImage(idx)} className="absolute -top-1 -right-1 p-1 bg-red-600 hover:bg-red-500 text-white rounded-full transition-all opacity-0 group-hover/img:opacity-100 scale-90"><FaTimes className="text-[10px]" /></button>
+                                                        <div key={idx} className="relative bg-zinc-900 border border-zinc-800/80 p-3 rounded-2xl flex flex-col gap-2 group/img shadow-md">
+                                                            <div className="relative aspect-video rounded-xl overflow-hidden bg-black/60 border border-zinc-850">
+                                                                <img src={img.url || img} alt="preview" className="w-full h-full object-cover" />
+                                                                <button type="button" onClick={() => removeImage(idx)} className="absolute top-2 right-2 p-1.5 bg-red-650 hover:bg-red-600 text-white rounded-full transition-all opacity-0 group-hover/img:opacity-100 scale-90 shadow-md"><FaTimes className="text-[10px]" /></button>
+                                                            </div>
+                                                            <input
+                                                                type="text"
+                                                                value={img.title || ''}
+                                                                onChange={(e) => updateImageTitle(idx, e.target.value)}
+                                                                placeholder="Image title/caption (e.g. Landing Page)"
+                                                                required
+                                                                className="w-full bg-zinc-950 border border-zinc-800 text-xs px-2.5 py-1.5 rounded-lg text-white placeholder-gray-600 focus:outline-none focus:ring-1 focus:ring-[#C4F000]/50"
+                                                            />
                                                         </div>
                                                     ))}
                                                 </div>

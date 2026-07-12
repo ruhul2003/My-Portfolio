@@ -1,5 +1,16 @@
 import mongoose from 'mongoose';
 
+const ProjectImageSchema = new mongoose.Schema({
+  url: {
+    type: String,
+    required: [true, 'Please provide an image url/base64.'],
+  },
+  title: {
+    type: String,
+    required: [true, 'Please provide a description/title for this screenshot.'],
+  },
+});
+
 const ProjectSchema = new mongoose.Schema({
   title: {
     type: String,
@@ -14,7 +25,7 @@ const ProjectSchema = new mongoose.Schema({
     default: '',
   },
   images: {
-    type: [String], // Array of base64 strings or image paths
+    type: [ProjectImageSchema],
     required: [true, 'Please provide 3-5 images.'],
     validate: {
       validator: function (v) {
