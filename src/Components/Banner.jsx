@@ -11,51 +11,74 @@ const Banner = () => {
         visible: {
             opacity: 1,
             transition: {
-                staggerChildren: 0.15,
+                staggerChildren: 0.12,
                 delayChildren: 0.1,
             }
         }
     };
 
-    // Text child variants with spring physics
+    // Text items: Fade and glide smoothly from Left to Right
     const textItemVariants = {
-        hidden: { opacity: 0, y: 30 },
+        hidden: { opacity: 0, x: -80 },
         visible: {
             opacity: 1,
-            y: 0,
+            x: 0,
             transition: {
                 type: "spring",
-                stiffness: 80,
-                damping: 15
+                stiffness: 55,
+                damping: 16
             }
         }
     };
 
-    // Profile Image variant
+    // Profile Image: Fade and glide smoothly from Right to Left
     const imageVariants = {
-        hidden: { opacity: 0, scale: 0.8, x: 50 },
+        hidden: { opacity: 0, x: 80 },
         visible: {
             opacity: 1,
-            scale: 1,
             x: 0,
             transition: {
                 type: "spring",
-                stiffness: 60,
-                damping: 12,
+                stiffness: 55,
+                damping: 16,
                 delay: 0.3
             }
         }
     };
 
+    // Marquee slide-up entry on load
+    const marqueeVariants = {
+        hidden: { opacity: 0, y: 40 },
+        visible: {
+            opacity: 1,
+            y: 0,
+            transition: {
+                type: "spring",
+                stiffness: 60,
+                damping: 14,
+                delay: 0.8
+            }
+        }
+    };
+
     return (
-        <section className="min-h-screen overflow-hidden w-full flex items-center text-white px-6 sm:px-12 md:px-20 pb-28 md:pb-24 relative">
-            {/* Decorative ambient background glows */}
-            <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-[#C4F000]/5 rounded-full blur-[120px] pointer-events-none -translate-x-1/2 -translate-y-1/2"></div>
-            <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-indigo-500/5 rounded-full blur-[100px] pointer-events-none translate-x-1/2 translate-y-1/2"></div>
+        <section className="min-h-[calc(100vh-80px)] overflow-hidden w-full flex items-center text-white px-6 sm:px-12 md:px-20 pb-28 md:pb-24 relative">
+            
+            {/* Animated slow-pulsing background glows */}
+            <motion.div 
+                animate={{ scale: [1, 1.15, 1], opacity: [0.5, 0.8, 0.5] }}
+                transition={{ repeat: Infinity, duration: 10, ease: "easeInOut" }}
+                className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-[#C4F000]/4 rounded-full blur-[130px] pointer-events-none -translate-x-1/2 -translate-y-1/2"
+            ></motion.div>
+            <motion.div 
+                animate={{ scale: [1, 1.1, 1], opacity: [0.4, 0.6, 0.4] }}
+                transition={{ repeat: Infinity, duration: 8, ease: "easeInOut", delay: 1 }}
+                className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-indigo-500/4 rounded-full blur-[110px] pointer-events-none translate-x-1/2 translate-y-1/2"
+            ></motion.div>
 
             <div className="max-w-7xl mx-auto w-full flex flex-col-reverse md:flex-row items-center gap-12 relative z-10">
 
-                {/* Text Section (Staggered Load) */}
+                {/* Text Section (Fading from left to right) */}
                 <motion.div 
                     variants={containerVariants}
                     initial="hidden"
@@ -98,7 +121,7 @@ const Banner = () => {
                     </motion.div>
                 </motion.div>
 
-                {/* Profile Image (Spring Load + Hover Float effect) */}
+                {/* Profile Image (Fading from right to left) */}
                 <motion.div 
                     variants={imageVariants}
                     initial="hidden"
@@ -106,24 +129,35 @@ const Banner = () => {
                     className="w-full md:w-[35%] flex justify-center md:justify-end"
                 >
                     <motion.div
-                        whileHover={{ y: -8, rotateZ: 1 }}
-                        transition={{ type: "spring", stiffness: 300, damping: 15 }}
-                        className="relative group cursor-pointer"
+                        animate={{ y: [0, -10, 0] }}
+                        transition={{ repeat: Infinity, duration: 6, ease: "easeInOut" }}
+                        className="relative"
                     >
-                        {/* Glow effect on hover */}
-                        <div className="absolute inset-0 bg-[#C4F000]/10 rounded-[32px] blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                        <img
-                            src={profilePic.src}
-                            alt="Ruhul Amin Profile Picture"
-                            className="w-[240px] sm:w-[280px] md:w-[320px] lg:w-[360px] aspect-4/5 object-cover rounded-[32px] border border-white/10 shadow-2xl relative z-10 transition-colors group-hover:border-[#C4F000]/30"
-                        />
+                        <motion.div
+                            whileHover={{ scale: 1.03, rotateZ: 1.5 }}
+                            transition={{ type: "spring", stiffness: 300, damping: 15 }}
+                            className="relative group cursor-pointer"
+                        >
+                            {/* Glow effect on hover */}
+                            <div className="absolute inset-0 bg-[#C4F000]/10 rounded-[32px] blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                            <img
+                                src={profilePic.src}
+                                alt="Ruhul Amin Profile Picture"
+                                className="w-[240px] sm:w-[280px] md:w-[320px] lg:w-[360px] aspect-4/5 object-cover rounded-[32px] border border-white/10 shadow-2xl relative z-10 transition-colors group-hover:border-[#C4F000]/30"
+                            />
+                        </motion.div>
                     </motion.div>
                 </motion.div>
 
             </div>
 
             {/* Infinite Scrolling Marquee at the very bottom */}
-            <div className="absolute bottom-0 left-0 w-full bg-zinc-950/40 border-t border-zinc-900/60 py-5 overflow-hidden backdrop-blur-xs select-none">
+            <motion.div 
+                variants={marqueeVariants}
+                initial="hidden"
+                animate="visible"
+                className="absolute bottom-0 left-0 w-full bg-zinc-950/40 border-t border-zinc-900/60 py-5 overflow-hidden backdrop-blur-xs select-none"
+            >
                 <div className="animate-marquee flex gap-16 text-[10px] sm:text-xs font-bold tracking-[0.25em] uppercase text-zinc-500">
                     {/* Half 1 */}
                     <div className="flex gap-16 shrink-0 items-center">
@@ -156,7 +190,7 @@ const Banner = () => {
                         <span className="text-[#C4F000]">•</span>
                     </div>
                 </div>
-            </div>
+            </motion.div>
         </section>
     );
 };
