@@ -3,30 +3,46 @@
 import React, { useState, useEffect, useRef, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaTrash, FaEdit, FaPlus, FaSignOutAlt, FaImage, FaTimes, FaGlobe, FaChevronLeft, FaChevronRight, FaPlusCircle } from 'react-icons/fa';
+import { FaTrash, FaEdit, FaPlus, FaSignOutAlt, FaImage, FaTimes, FaGlobe, FaBriefcase, FaGraduationCap } from 'react-icons/fa';
 
 function AdminDashboardContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const [authenticated, setAuthenticated] = useState(false);
     const [loading, setLoading] = useState(true);
-    const [projects, setProjects] = useState([]);
     
-    // Form state
+    // Tab State: 'projects' or 'education'
+    const [activeTab, setActiveTab] = useState('projects');
+    
+    // List States
+    const [projects, setProjects] = useState([]);
+    const [educationItems, setEducationItems] = useState([]);
+    
+    // Single Modal configuration
     const [modalOpen, setModalOpen] = useState(false);
+    const [modalType, setModalType] = useState('project'); // 'project' or 'education'
     const [editingId, setEditingId] = useState(null);
+    const [formLoading, setFormLoading] = useState(false);
+    const [formError, setFormError] = useState('');
+
+    // Project Form Fields State
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [link, setLink] = useState('');
     const [technologies, setTechnologies] = useState([]);
     const [techInput, setTechInput] = useState('');
     const [images, setImages] = useState([]); // base64 strings
-    const [formLoading, setFormLoading] = useState(false);
-    const [formError, setFormError] = useState('');
-    
+
+    // Education/Experience Form Fields State
+    const [eduYear, setEduYear] = useState('');
+    const [eduCompany, setEduCompany] = useState('');
+    const [eduRole, setEduRole] = useState('');
+    const [eduDescription, setEduDescription] = useState('');
+    const [eduOrder, setEduOrder] = useState(0);
+
     const fileInputRef = useRef(null);
 
-    // Verify auth status
+    // Verify auth status & Load initial data
     useEffect(() => {
         const checkAuth = async () => {
             try {
@@ -36,7 +52,8 @@ function AdminDashboardContent() {
                     router.push('/admin/login');
                 } else {
                     setAuthenticated(true);
-                    fetchProjects();
+                    // Fetch both lists
+                    await Promise.all([fetchProjects(), fetchEducation()]);
                 }
             } catch (err) {
                 router.push('/admin/login');
@@ -45,15 +62,36 @@ function AdminDashboardContent() {
         checkAuth();
     }, [router]);
 
-    // Fetch projects
+    // Handle initial tab / query params for edit
+    useEffect(() => {
+        const tabParam = searchParams.get('tab');
+        if (tabParam === 'education') {
+            setActiveTab('education');
+        } else {
+            setActiveTab('projects');
+        }
+    }, [searchParams]);
+
+    // Automatically trigger edit modal if ID is in URL query params
+    useEffect(() => {
+        const editId = searchParams.get('edit');
+        if (editId) {
+            if (activeTab === 'projects' && projects.length > 0) {
+                const proj = projects.find(p => p._id === editId);
+                if (proj) openProjectEditModal(proj);
+            } else if (activeTab === 'education' && educationItems.length > 0) {
+                const edu = educationItems.find(e => e._id === editId);
+                if (edu) openEducationEditModal(edu);
+            }
+        }
+    }, [searchParams, projects, educationItems, activeTab]);
+
+    // Fetch lists
     const fetchProjects = async () => {
         try {
-            setLoading(true);
             const res = await fetch('/api/projects');
             const data = await res.json();
-            if (data.success) {
-                setProjects(data.data);
-            }
+            if (data.success) setProjects(data.data);
         } catch (err) {
             console.error("Error fetching projects:", err);
         } finally {
@@ -61,18 +99,15 @@ function AdminDashboardContent() {
         }
     };
 
-    // Check query params for edit action
-    useEffect(() => {
-        if (projects.length > 0) {
-            const editId = searchParams.get('edit');
-            if (editId) {
-                const projToEdit = projects.find(p => p._id === editId);
-                if (projToEdit) {
-                    openEditModal(projToEdit);
-                }
-            }
+    const fetchEducation = async () => {
+        try {
+            const res = await fetch('/api/education');
+            const data = await res.json();
+            if (data.success) setEducationItems(data.data);
+        } catch (err) {
+            console.error("Error fetching education:", err);
         }
-    }, [searchParams, projects]);
+    };
 
     const handleLogout = async () => {
         try {
@@ -83,17 +118,15 @@ function AdminDashboardContent() {
                 router.refresh();
             }
         } catch (err) {
-            console.error("Error logging out:", err);
+            console.error("Logout error:", err);
         }
     };
 
-    const handleDelete = async (id) => {
+    // DELETIONS
+    const handleDeleteProject = async (id) => {
         if (!confirm("Are you sure you want to delete this project?")) return;
-
         try {
-            const res = await fetch(`/api/projects/${id}`, {
-                method: 'DELETE',
-            });
+            const res = await fetch(`/api/projects/${id}`, { method: 'DELETE' });
             const data = await res.json();
             if (data.success) {
                 setProjects(projects.filter(p => p._id !== id));
@@ -101,11 +134,26 @@ function AdminDashboardContent() {
                 alert(data.message || "Failed to delete project");
             }
         } catch (err) {
-            console.error("Error deleting project:", err);
+            console.error(err);
         }
     };
 
-    // Image compression utility
+    const handleDeleteEducation = async (id) => {
+        if (!confirm("Are you sure you want to delete this timeline entry?")) return;
+        try {
+            const res = await fetch(`/api/education/${id}`, { method: 'DELETE' });
+            const data = await res.json();
+            if (data.success) {
+                setEducationItems(educationItems.filter(e => e._id !== id));
+            } else {
+                alert(data.message || "Failed to delete entry");
+            }
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    // IMAGE COMPRESSION (For projects)
     const compressImage = (file) => {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
@@ -148,17 +196,14 @@ function AdminDashboardContent() {
 
         setFormError('');
         const compressedList = [];
-        
         for (let file of files) {
             try {
                 const compressed = await compressImage(file);
                 compressedList.push(compressed);
             } catch (err) {
-                console.error("Error compressing image:", err);
                 setFormError("Failed to process one or more images.");
             }
         }
-
         setImages(prev => [...prev, ...compressedList]);
     };
 
@@ -166,6 +211,7 @@ function AdminDashboardContent() {
         setImages(prev => prev.filter((_, idx) => idx !== index));
     };
 
+    // PROJECT TAGS
     const handleAddTech = (e) => {
         if (e.key === 'Enter' || e.key === ',') {
             e.preventDefault();
@@ -181,7 +227,9 @@ function AdminDashboardContent() {
         setTechnologies(prev => prev.filter((_, idx) => idx !== index));
     };
 
-    const openAddModal = () => {
+    // MODAL OPENERS
+    const openProjectAddModal = () => {
+        setModalType('project');
         setEditingId(null);
         setTitle('');
         setDescription('');
@@ -192,7 +240,8 @@ function AdminDashboardContent() {
         setModalOpen(true);
     };
 
-    const openEditModal = (project) => {
+    const openProjectEditModal = (project) => {
+        setModalType('project');
         setEditingId(project._id);
         setTitle(project.title);
         setDescription(project.description);
@@ -203,48 +252,100 @@ function AdminDashboardContent() {
         setModalOpen(true);
     };
 
+    const openEducationAddModal = () => {
+        setModalType('education');
+        setEditingId(null);
+        setEduYear('');
+        setEduCompany('');
+        setEduRole('');
+        setEduDescription('');
+        setEduOrder(educationItems.length + 1);
+        setFormError('');
+        setModalOpen(true);
+    };
+
+    const openEducationEditModal = (edu) => {
+        setModalType('education');
+        setEditingId(edu._id);
+        setEduYear(edu.year);
+        setEduCompany(edu.company);
+        setEduRole(edu.role);
+        setEduDescription(edu.description);
+        setEduOrder(edu.order || 0);
+        setFormError('');
+        setModalOpen(true);
+    };
+
     const closeModal = () => {
         setModalOpen(false);
-        // Clear edit query param if any
+        // Clear edit url queries if any
         if (searchParams.get('edit')) {
-            router.push('/admin');
+            router.push(`/admin?tab=${activeTab}`);
         }
     };
 
+    // SUBMIT HANDLERS
     const handleSubmit = async (e) => {
         e.preventDefault();
         setFormError('');
-
-        if (images.length < 3 || images.length > 5) {
-            setFormError(`Please provide 3-5 images for the project (current: ${images.length}).`);
-            return;
-        }
-
         setFormLoading(true);
-        const payload = { title, description, link, technologies, images };
 
         try {
-            const url = editingId ? `/api/projects/${editingId}` : '/api/projects';
-            const method = editingId ? 'PUT' : 'POST';
+            if (modalType === 'project') {
+                if (images.length < 3 || images.length > 5) {
+                    setFormError(`Please provide 3-5 images for the project (current: ${images.length}).`);
+                    setFormLoading(false);
+                    return;
+                }
 
-            const res = await fetch(url, {
-                method,
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload),
-            });
+                const payload = { title, description, link, technologies, images };
+                const url = editingId ? `/api/projects/${editingId}` : '/api/projects';
+                const method = editingId ? 'PUT' : 'POST';
 
-            const data = await res.json();
-            if (data.success) {
-                closeModal();
-                fetchProjects();
+                const res = await fetch(url, {
+                    method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload),
+                });
+
+                const data = await res.json();
+                if (data.success) {
+                    closeModal();
+                    fetchProjects();
+                } else {
+                    setFormError(data.message || "Failed to save project.");
+                }
             } else {
-                setFormError(data.message || "Failed to save project.");
+                // Education Type
+                const payload = { year: eduYear, company: eduCompany, role: eduRole, description: eduDescription, order: Number(eduOrder) };
+                const url = editingId ? `/api/education/${editingId}` : '/api/education';
+                const method = editingId ? 'PUT' : 'POST';
+
+                const res = await fetch(url, {
+                    method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload),
+                });
+
+                const data = await res.json();
+                if (data.success) {
+                    closeModal();
+                    fetchEducation();
+                } else {
+                    setFormError(data.message || "Failed to save entry.");
+                }
             }
         } catch (err) {
             setFormError("An error occurred. Please try again.");
         } finally {
             setFormLoading(false);
         }
+    };
+
+    // Change Tab
+    const handleTabChange = (tab) => {
+        setActiveTab(tab);
+        router.push(`/admin?tab=${tab}`);
     };
 
     if (loading && !authenticated) {
@@ -259,20 +360,20 @@ function AdminDashboardContent() {
     return (
         <div className="min-h-screen bg-[#020617] py-12 px-4 sm:px-6 lg:px-8">
             <div className="max-w-6xl mx-auto">
-                {/* Header */}
-                <div className="flex flex-wrap justify-between items-center bg-zinc-950 border border-zinc-800 rounded-3xl p-6 mb-12 gap-4 shadow-xl">
+                {/* Top header bar */}
+                <div className="flex flex-wrap justify-between items-center bg-zinc-950 border border-zinc-800 rounded-3xl p-6 mb-10 gap-4 shadow-xl">
                     <div>
                         <h1 className="text-2xl sm:text-3xl font-extrabold text-white">
                             Admin <span className="text-[#C4F000]">Dashboard</span>
                         </h1>
-                        <p className="text-gray-400 text-sm mt-1">Manage and update your portfolio projects.</p>
+                        <p className="text-gray-400 text-sm mt-1">Manage and update your portfolio details.</p>
                     </div>
                     <div className="flex items-center gap-3">
                         <button
-                            onClick={openAddModal}
+                            onClick={activeTab === 'projects' ? openProjectAddModal : openEducationAddModal}
                             className="bg-[#C4F000] hover:bg-[#b8dd00] text-black px-5 py-2.5 rounded-full font-bold text-sm transition-all hover:scale-105 flex items-center gap-2"
                         >
-                            <FaPlus /> Add Project
+                            <FaPlus /> Add {activeTab === 'projects' ? 'Project' : 'Timeline Entry'}
                         </button>
                         <button
                             onClick={handleLogout}
@@ -283,281 +384,210 @@ function AdminDashboardContent() {
                     </div>
                 </div>
 
-                {/* Dashboard stats / welcome info */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-                    <div className="bg-zinc-900/40 border border-zinc-800/80 rounded-2xl p-6">
-                        <p className="text-gray-500 text-xs font-semibold uppercase tracking-wider">Total Projects</p>
-                        <p className="text-4xl font-extrabold text-white mt-2">{projects.length}</p>
-                    </div>
-                    <div className="bg-zinc-900/40 border border-zinc-800/80 rounded-2xl p-6">
-                        <p className="text-gray-500 text-xs font-semibold uppercase tracking-wider">User Status</p>
-                        <p className="text-lg font-bold text-lime-400 mt-2 flex items-center gap-2">
-                            <span className="w-2.5 h-2.5 bg-lime-400 rounded-full animate-pulse"></span>
-                            Logged in as Admin
-                        </p>
-                    </div>
-                    <div className="bg-zinc-900/40 border border-zinc-800/80 rounded-2xl p-6">
-                        <p className="text-gray-500 text-xs font-semibold uppercase tracking-wider">Database Connection</p>
-                        <p className="text-lg font-bold text-blue-400 mt-2 flex items-center gap-2">
-                            <span className="w-2.5 h-2.5 bg-blue-400 rounded-full"></span>
-                            MongoDB Connected
-                        </p>
-                    </div>
+                {/* Dashboard Tabs Selector */}
+                <div className="flex border-b border-zinc-800 mb-8 gap-6 text-sm">
+                    <button
+                        onClick={() => handleTabChange('projects')}
+                        className={`pb-4 px-2 font-bold transition-all relative ${activeTab === 'projects' ? 'text-[#C4F000]' : 'text-gray-400 hover:text-white'}`}
+                    >
+                        <span className="flex items-center gap-2"><FaGlobe /> Projects ({projects.length})</span>
+                        {activeTab === 'projects' && (
+                            <motion.div layoutId="active_tab_indicator" className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#C4F000]" />
+                        )}
+                    </button>
+                    <button
+                        onClick={() => handleTabChange('education')}
+                        className={`pb-4 px-2 font-bold transition-all relative ${activeTab === 'education' ? 'text-[#C4F000]' : 'text-gray-400 hover:text-white'}`}
+                    >
+                        <span className="flex items-center gap-2"><FaBriefcase /> Education & Experience ({educationItems.length})</span>
+                        {activeTab === 'education' && (
+                            <motion.div layoutId="active_tab_indicator" className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#C4F000]" />
+                        )}
+                    </button>
                 </div>
 
-                {/* Projects Manager */}
+                {/* Content based on Active Tab */}
                 <div className="bg-zinc-950 border border-zinc-800 rounded-3xl p-6 sm:p-8 shadow-xl">
-                    <h2 className="text-xl font-bold text-white mb-6">Your Projects</h2>
                     
-                    {loading ? (
-                        <div className="flex flex-col items-center justify-center py-20">
-                            <div className="w-10 h-10 border-4 border-[#C4F000] border-t-transparent rounded-full animate-spin"></div>
-                        </div>
-                    ) : projects.length === 0 ? (
-                        <div className="text-center py-20 border border-dashed border-zinc-800 rounded-2xl text-gray-500">
-                            <p className="text-lg">No projects added yet.</p>
-                            <button
-                                onClick={openAddModal}
-                                className="text-[#C4F000] hover:underline mt-2 inline-flex items-center gap-1 font-semibold"
-                            >
-                                Create your first project now <FaPlusCircle className="text-xs" />
-                            </button>
-                        </div>
-                    ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            {projects.map((project) => (
-                                <div
-                                    key={project._id}
-                                    className="bg-zinc-900/50 border border-zinc-850 rounded-2xl p-5 flex flex-col justify-between hover:border-zinc-700 transition-all duration-300 shadow-md group"
-                                >
-                                    <div>
-                                        <div className="relative aspect-video rounded-xl overflow-hidden mb-4 bg-black/40 border border-zinc-800">
-                                            <img
-                                                src={project.images[0] || "/assets/p1.png"}
-                                                alt={project.title}
-                                                className="w-full h-full object-cover"
-                                            />
-                                            <div className="absolute top-2 right-2 bg-black/80 backdrop-blur-sm border border-zinc-800 text-[11px] font-semibold text-gray-300 px-2 py-0.5 rounded-full">
-                                                {project.images.length} Images
+                    {activeTab === 'projects' ? (
+                        /* PROJECTS TAB */
+                        <div>
+                            <h2 className="text-xl font-bold text-white mb-6">Manage Projects</h2>
+                            {projects.length === 0 ? (
+                                <div className="text-center py-20 border border-dashed border-zinc-800 rounded-2xl text-gray-500">
+                                    <p className="text-lg">No projects added yet.</p>
+                                    <button onClick={openProjectAddModal} className="text-[#C4F000] hover:underline mt-2 inline-flex items-center gap-1 font-semibold">
+                                        Create your first project <FaPlus />
+                                    </button>
+                                </div>
+                            ) : (
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    {projects.map((project) => (
+                                        <div key={project._id} className="bg-zinc-900/40 border border-zinc-850 rounded-2xl p-5 flex flex-col justify-between hover:border-zinc-700 transition-all duration-300 shadow-md group">
+                                            <div>
+                                                <div className="relative aspect-video rounded-xl overflow-hidden mb-4 bg-black/40 border border-zinc-800">
+                                                    <img src={project.images[0] || "/assets/p1.png"} alt={project.title} className="w-full h-full object-cover" />
+                                                    <div className="absolute top-2 right-2 bg-black/80 backdrop-blur-sm border border-zinc-800 text-[11px] font-semibold text-gray-300 px-2 py-0.5 rounded-full">
+                                                        {project.images.length} Images
+                                                    </div>
+                                                </div>
+                                                <h3 className="text-lg font-bold text-white group-hover:text-[#C4F000] transition-colors">{project.title}</h3>
+                                                <p className="text-gray-400 text-xs mt-1.5 line-clamp-2 leading-relaxed">{project.description}</p>
+                                                <div className="flex flex-wrap gap-1.5 mt-3">
+                                                    {project.technologies.map((t, idx) => (
+                                                        <span key={idx} className="text-[10px] bg-zinc-850 text-gray-400 px-2.5 py-0.5 rounded-full">{t}</span>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                            <div className="flex gap-2.5 mt-5 pt-4 border-t border-zinc-850/60">
+                                                <button onClick={() => openProjectEditModal(project)} className="flex-1 bg-zinc-800 hover:bg-zinc-700 text-white font-bold py-2 px-3 rounded-lg text-xs transition-colors flex items-center justify-center gap-1.5"><FaEdit /> Edit</button>
+                                                <button onClick={() => handleDeleteProject(project._id)} className="bg-red-950/20 border border-red-500/30 hover:bg-red-900/30 text-red-400 font-bold py-2 px-3 rounded-lg text-xs transition-colors flex items-center justify-center gap-1.5"><FaTrash /> Delete</button>
                                             </div>
                                         </div>
-                                        <h3 className="text-lg font-bold text-white group-hover:text-[#C4F000] transition-colors">{project.title}</h3>
-                                        <p className="text-gray-400 text-xs mt-1.5 line-clamp-2 leading-relaxed">{project.description}</p>
-                                        
-                                        {/* Tags */}
-                                        <div className="flex flex-wrap gap-1.5 mt-3">
-                                            {project.technologies.map((t, idx) => (
-                                                <span key={idx} className="text-[10px] bg-zinc-800 text-gray-400 px-2.5 py-0.5 rounded-full">
-                                                    {t}
-                                                </span>
-                                            ))}
-                                        </div>
-                                    </div>
-
-                                    <div className="flex gap-2.5 mt-5 pt-4 border-t border-zinc-850/60">
-                                        <button
-                                            onClick={() => openEditModal(project)}
-                                            className="flex-1 bg-zinc-800 hover:bg-zinc-700 text-white font-bold py-2 px-3 rounded-lg text-xs transition-colors flex items-center justify-center gap-1.5"
-                                        >
-                                            <FaEdit /> Edit
-                                        </button>
-                                        <button
-                                            onClick={() => handleDelete(project._id)}
-                                            className="bg-red-950/20 border border-red-500/30 hover:bg-red-900/30 text-red-400 font-bold py-2 px-3 rounded-lg text-xs transition-colors flex items-center justify-center gap-1.5"
-                                        >
-                                            <FaTrash /> Delete
-                                        </button>
-                                    </div>
+                                    ))}
                                 </div>
-                            ))}
+                            )}
+                        </div>
+                    ) : (
+                        /* EDUCATION & EXPERIENCE TAB */
+                        <div>
+                            <h2 className="text-xl font-bold text-white mb-6">Manage Timeline Entries</h2>
+                            {educationItems.length === 0 ? (
+                                <div className="text-center py-20 border border-dashed border-zinc-800 rounded-2xl text-gray-500">
+                                    <p className="text-lg">No education or experience entries added yet.</p>
+                                    <button onClick={openEducationAddModal} className="text-[#C4F000] hover:underline mt-2 inline-flex items-center gap-1 font-semibold">
+                                        Create your first entry <FaPlus />
+                                    </button>
+                                </div>
+                            ) : (
+                                <div className="space-y-4">
+                                    {educationItems.map((edu) => (
+                                        <div key={edu._id} className="bg-zinc-900/40 border border-zinc-850 hover:border-zinc-700 p-5 rounded-2xl flex flex-col md:flex-row justify-between md:items-center gap-4 transition-all duration-300">
+                                            <div className="space-y-1">
+                                                <div className="flex items-center gap-3">
+                                                    <span className="text-xs font-bold text-[#C4F000] border border-[#C4F000]/40 px-2.5 py-0.5 rounded-full">{edu.year}</span>
+                                                    <span className="text-[11px] bg-zinc-800 text-gray-500 px-2 py-0.5 rounded">Order: {edu.order}</span>
+                                                </div>
+                                                <h3 className="text-lg font-bold text-white mt-1">{edu.company}</h3>
+                                                <p className="text-sm font-semibold text-gray-300">{edu.role}</p>
+                                                <p className="text-xs text-gray-500 max-w-3xl leading-relaxed mt-2">{edu.description}</p>
+                                            </div>
+                                            <div className="flex gap-2 shrink-0 md:self-center">
+                                                <button onClick={() => openEducationEditModal(edu)} className="p-2.5 bg-zinc-800 hover:bg-zinc-700 text-white rounded-xl text-xs transition-colors flex items-center gap-1.5"><FaEdit /> Edit</button>
+                                                <button onClick={() => handleDeleteEducation(edu._id)} className="p-2.5 bg-red-950/20 border border-red-500/30 hover:bg-red-900/30 text-red-400 rounded-xl text-xs transition-colors flex items-center gap-1.5"><FaTrash /> Delete</button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
                         </div>
                     )}
                 </div>
             </div>
 
-            {/* Add/Edit Modal */}
+            {/* Combined Add/Edit Modal */}
             <AnimatePresence>
                 {modalOpen && (
                     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            onClick={closeModal}
-                            className="absolute inset-0 bg-black/80 backdrop-blur-sm"
-                        />
+                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={closeModal} className="absolute inset-0 bg-black/80 backdrop-blur-sm" />
 
-                        <motion.div
-                            initial={{ opacity: 0, scale: 0.95, y: 15 }}
-                            animate={{ opacity: 1, scale: 1, y: 0 }}
-                            exit={{ opacity: 0, scale: 0.95, y: 15 }}
-                            className="relative w-full max-w-2xl bg-zinc-950 border border-zinc-800 rounded-3xl shadow-2xl p-6 sm:p-8 max-h-[90vh] overflow-y-auto z-10"
-                        >
-                            <button
-                                onClick={closeModal}
-                                className="absolute top-5 right-5 p-2 text-gray-500 hover:text-white rounded-full bg-zinc-900 transition-colors border border-zinc-800"
-                            >
-                                <FaTimes />
-                            </button>
+                        <motion.div initial={{ opacity: 0, scale: 0.95, y: 15 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 15 }} className="relative w-full max-w-2xl bg-zinc-950 border border-zinc-800 rounded-3xl shadow-2xl p-6 sm:p-8 max-h-[90vh] overflow-y-auto z-10">
+                            <button onClick={closeModal} className="absolute top-5 right-5 p-2 text-gray-500 hover:text-white rounded-full bg-zinc-900 transition-colors border border-zinc-800"><FaTimes /></button>
 
                             <h3 className="text-xl sm:text-2xl font-bold text-white mb-6">
-                                {editingId ? "Edit Project" : "Add New Project"}
+                                {editingId ? "Edit" : "Add"} {modalType === 'project' ? "Project" : "Timeline Entry"}
                             </h3>
 
                             {formError && (
-                                <div className="bg-red-950/30 border border-red-500/50 text-red-400 p-4 rounded-2xl text-sm mb-6">
-                                    {formError}
-                                </div>
+                                <div className="bg-red-950/30 border border-red-500/50 text-red-400 p-4 rounded-2xl text-sm mb-6">{formError}</div>
                             )}
 
                             <form onSubmit={handleSubmit} className="space-y-5">
-                                {/* Title */}
-                                <div className="space-y-1.5">
-                                    <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Project Title</label>
-                                    <input
-                                        type="text"
-                                        value={title}
-                                        onChange={(e) => setTitle(e.target.value)}
-                                        placeholder="e.g. Acme SaaS"
-                                        required
-                                        className="w-full bg-zinc-900 border border-zinc-800 hover:border-zinc-700 text-white px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#C4F000]/50 transition-all"
-                                    />
-                                </div>
-
-                                {/* Description */}
-                                <div className="space-y-1.5">
-                                    <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Description</label>
-                                    <textarea
-                                        rows={4}
-                                        value={description}
-                                        onChange={(e) => setDescription(e.target.value)}
-                                        placeholder="Explain the project details and what you delivered..."
-                                        required
-                                        className="w-full bg-zinc-900 border border-zinc-800 hover:border-zinc-700 text-white px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#C4F000]/50 resize-none transition-all"
-                                    />
-                                </div>
-
-                                {/* Live Link */}
-                                <div className="space-y-1.5">
-                                    <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Live URL Link (Optional)</label>
-                                    <div className="relative">
-                                        <span className="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-500 text-sm">
-                                            <FaGlobe />
-                                        </span>
-                                        <input
-                                            type="url"
-                                            value={link}
-                                            onChange={(e) => setLink(e.target.value)}
-                                            placeholder="https://example.com"
-                                            className="w-full bg-zinc-900 border border-zinc-800 hover:border-zinc-700 text-white pl-10 pr-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#C4F000]/50 transition-all"
-                                        />
-                                    </div>
-                                </div>
-
-                                {/* Technology Tags selection widget */}
-                                <div className="space-y-1.5">
-                                    <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Technologies (Type tag and hit Enter)</label>
-                                    <div className="w-full bg-zinc-900 border border-zinc-800 hover:border-zinc-700 rounded-xl p-2.5 flex flex-wrap gap-1.5 items-center">
-                                        {technologies.map((tech, idx) => (
-                                            <span
-                                                key={idx}
-                                                className="text-xs bg-zinc-800 border border-zinc-750 text-white px-2.5 py-1 rounded-full flex items-center gap-1.5"
-                                            >
-                                                {tech}
-                                                <button
-                                                    type="button"
-                                                    onClick={() => removeTech(idx)}
-                                                    className="text-gray-500 hover:text-red-400 transition-colors"
-                                                >
-                                                    <FaTimes className="text-[10px]" />
-                                                </button>
-                                            </span>
-                                        ))}
-                                        <input
-                                            type="text"
-                                            value={techInput}
-                                            onChange={(e) => setTechInput(e.target.value)}
-                                            onKeyDown={handleAddTech}
-                                            placeholder={technologies.length === 0 ? "e.g. NextJS, Tailwind, MongoDB" : "Add tag..."}
-                                            className="bg-transparent text-white border-none outline-none focus:ring-0 text-sm flex-1 min-w-[100px] py-0.5"
-                                        />
-                                    </div>
-                                </div>
-
-                                {/* Dynamic Image Upload */}
-                                <div className="space-y-2.5">
-                                    <div className="flex justify-between items-center">
-                                        <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Project Images (Need 3 to 5 images)</label>
-                                        <span className="text-[11px] font-bold text-gray-500">
-                                            {images.length} / 5 Images
-                                        </span>
-                                    </div>
-
-                                    {/* Upload Trigger Area */}
-                                    {images.length < 5 && (
-                                        <div
-                                            onClick={() => fileInputRef.current?.click()}
-                                            className="border-2 border-dashed border-zinc-800 hover:border-[#C4F000]/60 bg-zinc-900/30 rounded-2xl py-6 flex flex-col items-center justify-center gap-2 cursor-pointer transition-colors"
-                                        >
-                                            <FaImage className="text-2xl text-gray-500" />
-                                            <span className="text-xs text-gray-400 font-medium">Click to select files to upload & compress</span>
-                                            <span className="text-[10px] text-gray-600">Supports JPEG, PNG</span>
-                                            <input
-                                                type="file"
-                                                ref={fileInputRef}
-                                                onChange={handleImageUpload}
-                                                multiple
-                                                accept="image/*"
-                                                className="hidden"
-                                            />
+                                {modalType === 'project' ? (
+                                    /* PROJECT FORM CONTENT */
+                                    <>
+                                        <div className="space-y-1.5">
+                                            <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Project Title</label>
+                                            <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="e.g. Acme SaaS" required className="w-full bg-zinc-900 border border-zinc-800 hover:border-zinc-700 text-white px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#C4F000]/50 transition-all" />
                                         </div>
-                                    )}
-
-                                    {/* Uploaded Images Previews Carousel / grid list */}
-                                    {images.length > 0 && (
-                                        <div className="grid grid-cols-3 sm:grid-cols-5 gap-3.5 mt-2">
-                                            {images.map((img, idx) => (
-                                                <div
-                                                    key={idx}
-                                                    className="relative aspect-video rounded-lg overflow-hidden bg-black/60 border border-zinc-850 group/img"
-                                                >
-                                                    <img
-                                                        src={img}
-                                                        alt={`Preview ${idx + 1}`}
-                                                        className="w-full h-full object-cover"
-                                                    />
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => removeImage(idx)}
-                                                        className="absolute -top-1 -right-1 p-1 bg-red-600 hover:bg-red-500 text-white rounded-full transition-all opacity-0 group-hover/img:opacity-100 scale-90 hover:scale-100 shadow-md"
-                                                    >
-                                                        <FaTimes className="text-[10px]" />
-                                                    </button>
+                                        <div className="space-y-1.5">
+                                            <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Description</label>
+                                            <textarea rows={4} value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Explain the project details..." required className="w-full bg-zinc-900 border border-zinc-800 hover:border-zinc-700 text-white px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#C4F000]/50 resize-none transition-all" />
+                                        </div>
+                                        <div className="space-y-1.5">
+                                            <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Live URL Link (Optional)</label>
+                                            <div className="relative">
+                                                <span className="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-500 text-sm"><FaGlobe /></span>
+                                                <input type="url" value={link} onChange={(e) => setLink(e.target.value)} placeholder="https://example.com" className="w-full bg-zinc-900 border border-zinc-800 hover:border-zinc-700 text-white pl-10 pr-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#C4F000]/50 transition-all" />
+                                            </div>
+                                        </div>
+                                        <div className="space-y-1.5">
+                                            <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Technologies (Hit Enter/Comma)</label>
+                                            <div className="w-full bg-zinc-900 border border-zinc-800 hover:border-zinc-700 rounded-xl p-2.5 flex flex-wrap gap-1.5 items-center">
+                                                {technologies.map((tech, idx) => (
+                                                    <span key={idx} className="text-xs bg-zinc-850 border border-zinc-750 text-white px-2.5 py-1 rounded-full flex items-center gap-1.5">
+                                                        {tech}
+                                                        <button type="button" onClick={() => removeTech(idx)} className="text-gray-500 hover:text-red-400"><FaTimes className="text-[10px]" /></button>
+                                                    </span>
+                                                ))}
+                                                <input type="text" value={techInput} onChange={(e) => setTechInput(e.target.value)} onKeyDown={handleAddTech} placeholder={technologies.length === 0 ? "e.g. NextJS, Tailwind" : "Add..."} className="bg-transparent text-white border-none outline-none focus:ring-0 text-sm flex-1 min-w-[100px] py-0.5" />
+                                            </div>
+                                        </div>
+                                        <div className="space-y-2.5">
+                                            <div className="flex justify-between items-center">
+                                                <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Project Images (Need 3 to 5 images)</label>
+                                                <span className="text-[11px] font-bold text-gray-500">{images.length} / 5 Images</span>
+                                            </div>
+                                            {images.length < 5 && (
+                                                <div onClick={() => fileInputRef.current?.click()} className="border-2 border-dashed border-zinc-800 hover:border-[#C4F000]/60 bg-zinc-900/30 rounded-2xl py-6 flex flex-col items-center justify-center gap-2 cursor-pointer transition-colors">
+                                                    <FaImage className="text-2xl text-gray-500" />
+                                                    <span className="text-xs text-gray-400 font-medium">Click to upload and compress</span>
+                                                    <input type="file" ref={fileInputRef} onChange={handleImageUpload} multiple accept="image/*" className="hidden" />
                                                 </div>
-                                            ))}
+                                            )}
+                                            {images.length > 0 && (
+                                                <div className="grid grid-cols-3 sm:grid-cols-5 gap-3.5 mt-2">
+                                                    {images.map((img, idx) => (
+                                                        <div key={idx} className="relative aspect-video rounded-lg overflow-hidden bg-black/60 border border-zinc-850 group/img">
+                                                            <img src={img} alt="preview" className="w-full h-full object-cover" />
+                                                            <button type="button" onClick={() => removeImage(idx)} className="absolute -top-1 -right-1 p-1 bg-red-600 hover:bg-red-500 text-white rounded-full transition-all opacity-0 group-hover/img:opacity-100 scale-90"><FaTimes className="text-[10px]" /></button>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            )}
                                         </div>
-                                    )}
-                                </div>
+                                    </>
+                                ) : (
+                                    /* EDUCATION/EXPERIENCE FORM CONTENT */
+                                    <>
+                                        <div className="space-y-1.5">
+                                            <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Year Range</label>
+                                            <input type="text" value={eduYear} onChange={(e) => setEduYear(e.target.value)} placeholder="e.g. 2020 - PRESENT" required className="w-full bg-zinc-900 border border-zinc-800 hover:border-zinc-700 text-white px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#C4F000]/50 transition-all" />
+                                        </div>
+                                        <div className="space-y-1.5">
+                                            <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Company / School / Institution</label>
+                                            <input type="text" value={eduCompany} onChange={(e) => setEduCompany(e.target.value)} placeholder="e.g. BloomHub Technology" required className="w-full bg-zinc-900 border border-zinc-800 hover:border-zinc-700 text-white px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#C4F000]/50 transition-all" />
+                                        </div>
+                                        <div className="space-y-1.5">
+                                            <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Role / Degree / Position</label>
+                                            <input type="text" value={eduRole} onChange={(e) => setEduRole(e.target.value)} placeholder="e.g. Application Developer" required className="w-full bg-zinc-900 border border-zinc-800 hover:border-zinc-700 text-white px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#C4F000]/50 transition-all" />
+                                        </div>
+                                        <div className="space-y-1.5">
+                                            <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Display Order (Sorting)</label>
+                                            <input type="number" value={eduOrder} onChange={(e) => setEduOrder(e.target.value)} required className="w-full bg-zinc-900 border border-zinc-800 hover:border-zinc-700 text-white px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#C4F000]/50 transition-all" />
+                                        </div>
+                                        <div className="space-y-1.5">
+                                            <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Description</label>
+                                            <textarea rows={4} value={eduDescription} onChange={(e) => setEduDescription(e.target.value)} placeholder="Explain what you did or studied during this period..." required className="w-full bg-zinc-900 border border-zinc-800 hover:border-zinc-700 text-white px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#C4F000]/50 resize-none transition-all" />
+                                        </div>
+                                    </>
+                                )}
 
-                                {/* Form actions */}
+                                {/* Modal action buttons */}
                                 <div className="flex gap-3 pt-4 border-t border-zinc-900 mt-6">
-                                    <button
-                                        type="button"
-                                        onClick={closeModal}
-                                        className="flex-1 bg-zinc-900 hover:bg-zinc-850 border border-zinc-800 text-white font-bold py-3.5 rounded-xl transition-all text-sm"
-                                    >
-                                        Cancel
-                                    </button>
-                                    <button
-                                        type="submit"
-                                        disabled={formLoading}
-                                        className="flex-1 bg-[#C4F000] hover:bg-[#b8dd00] text-black font-bold py-3.5 rounded-xl transition-all shadow-md shadow-[#C4F000]/10 flex items-center justify-center gap-2 text-sm disabled:opacity-50"
-                                    >
-                                        {formLoading ? (
-                                            <div className="w-5 h-5 border-2 border-black border-t-transparent rounded-full animate-spin"></div>
-                                        ) : (
-                                            editingId ? "Save Changes" : "Create Project"
-                                        )}
+                                    <button type="button" onClick={closeModal} className="flex-1 bg-zinc-900 hover:bg-zinc-850 border border-zinc-800 text-white font-bold py-3.5 rounded-xl transition-all text-sm">Cancel</button>
+                                    <button type="submit" disabled={formLoading} className="flex-1 bg-[#C4F000] hover:bg-[#b8dd00] text-black font-bold py-3.5 rounded-xl transition-all shadow-md flex items-center justify-center gap-2 text-sm disabled:opacity-50">
+                                        {formLoading ? <div className="w-5 h-5 border-2 border-black border-t-transparent rounded-full animate-spin"></div> : (editingId ? "Save Changes" : "Create")}
                                     </button>
                                 </div>
                             </form>
