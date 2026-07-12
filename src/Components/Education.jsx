@@ -112,10 +112,10 @@ const Education = () => {
             <div className='py-20 bg-zinc-950/40 w-full border-y border-zinc-900/80 backdrop-blur-sm'>
                 <div className='w-9/12 mx-auto flex flex-col md:flex-row justify-between items-start md:items-end gap-6'>
                     <div>
-                        <h1 className="text-4xl md:text-6xl lg:text-[80px] font-bold text-[#B3B3B3] tracking-tight">
+                        <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold text-[#B3B3B3] tracking-tight">
                             Education & Experience
                         </h1>
-                        <p className='text-[#B4B4B4] mt-10 ml-5 md:ml-10 text-[20px] max-w-2xl font-light leading-relaxed'>
+                        <p className='text-[#B4B4B4] mt-5 text-base md:text-lg max-w-2xl font-light leading-relaxed'>
                             Established history of success in design and development, consistently delivering valuable insights and driving significant results.
                         </p>
                     </div>
@@ -142,7 +142,7 @@ const Education = () => {
             {/* main Cards Grid Section */}
             <div className="bg-transparent text-white mt-20 pb-20 px-6 md:px-12 lg:px-20 border-b border-zinc-900/60">
                 <div className="max-w-6xl mx-auto">
-                    <h2 className="text-3xl font-extrabold text-white mb-10 tracking-tight">
+                    <h2 className="text-2xl font-bold text-white mb-8 tracking-tight">
                         Experience & Timeline
                     </h2>
 
@@ -196,15 +196,15 @@ const Education = () => {
                                                     </div>
                                                 </div>
 
-                                                <h3 className="text-xl font-bold tracking-tight text-white mt-5 group-hover:text-[#D4FF00] transition-colors duration-300">
+                                                <h3 className="text-lg font-bold tracking-tight text-white mt-4 group-hover:text-[#D4FF00] transition-colors duration-300">
                                                     {item.company}
                                                 </h3>
 
-                                                <p className="text-sm font-semibold text-gray-400 mt-1">
+                                                <p className="text-xs font-semibold text-zinc-400 mt-1">
                                                     {item.role}
                                                 </p>
 
-                                                <p className="mt-4 text-gray-500 leading-relaxed text-xs font-light">
+                                                <p className="mt-3.5 text-gray-400 leading-relaxed text-xs font-light">
                                                     {item.description}
                                                 </p>
                                             </div>
@@ -240,7 +240,7 @@ const Education = () => {
             {/* Certifications & Awards Section */}
             <div className="mt-20 px-6 md:px-12 lg:px-20 pb-20">
                 <div className="max-w-6xl mx-auto">
-                    <h2 className="text-3xl font-extrabold text-white mb-10 tracking-tight flex items-center gap-3">
+                    <h2 className="text-2xl font-bold text-white mb-8 tracking-tight flex items-center gap-3">
                         Certifications & Awards
                     </h2>
 
@@ -279,11 +279,11 @@ const Education = () => {
                                                 <span className="text-xs text-gray-500 font-semibold">{cert.year}</span>
                                             </div>
 
-                                            <h3 className="text-lg font-bold text-white mt-5 group-hover:text-[#D4FF00] transition-colors">{cert.title}</h3>
-                                            <p className="text-xs font-semibold text-gray-400 mt-1">{cert.issuer}</p>
+                                            <h3 className="text-base font-bold text-white mt-4 group-hover:text-[#D4FF00] transition-colors">{cert.title}</h3>
+                                            <p className="text-[11px] font-semibold text-zinc-400 mt-1">{cert.issuer}</p>
 
                                             {cert.description && (
-                                                <p className="text-xs text-gray-500 mt-3 font-light leading-relaxed">{cert.description}</p>
+                                                <p className="text-xs text-gray-400 mt-3.5 font-light leading-relaxed">{cert.description}</p>
                                             )}
                                         </div>
 
