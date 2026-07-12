@@ -1,0 +1,583 @@
+"use client";
+
+import React, { useState, useEffect, useRef, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { motion, AnimatePresence } from 'framer-motion';
+import { FaTrash, FaEdit, FaPlus, FaSignOutAlt, FaImage, FaTimes, FaGlobe, FaChevronLeft, FaChevronRight, FaPlusCircle } from 'react-icons/fa';
+
+function AdminDashboardContent() {
+    const router = useRouter();
+    const searchParams = useSearchParams();
+    const [authenticated, setAuthenticated] = useState(false);
+    const [loading, setLoading] = useState(true);
+    const [projects, setProjects] = useState([]);
+    
+    // Form state
+    const [modalOpen, setModalOpen] = useState(false);
+    const [editingId, setEditingId] = useState(null);
+    const [title, setTitle] = useState('');
+    const [description, setDescription] = useState('');
+    const [link, setLink] = useState('');
+    const [technologies, setTechnologies] = useState([]);
+    const [techInput, setTechInput] = useState('');
+    const [images, setImages] = useState([]); // base64 strings
+    const [formLoading, setFormLoading] = useState(false);
+    const [formError, setFormError] = useState('');
+    
+    const fileInputRef = useRef(null);
+
+    // Verify auth status
+    useEffect(() => {
+        const checkAuth = async () => {
+            try {
+                const res = await fetch('/api/auth/status');
+                const data = await res.json();
+                if (!data.authenticated) {
+                    router.push('/admin/login');
+                } else {
+                    setAuthenticated(true);
+                    fetchProjects();
+                }
+            } catch (err) {
+                router.push('/admin/login');
+            }
+        };
+        checkAuth();
+    }, [router]);
+
+    // Fetch projects
+    const fetchProjects = async () => {
+        try {
+            setLoading(true);
+            const res = await fetch('/api/projects');
+            const data = await res.json();
+            if (data.success) {
+                setProjects(data.data);
+            }
+        } catch (err) {
+            console.error("Error fetching projects:", err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Check query params for edit action
+    useEffect(() => {
+        if (projects.length > 0) {
+            const editId = searchParams.get('edit');
+            if (editId) {
+                const projToEdit = projects.find(p => p._id === editId);
+                if (projToEdit) {
+                    openEditModal(projToEdit);
+                }
+            }
+        }
+    }, [searchParams, projects]);
+
+    const handleLogout = async () => {
+        try {
+            const res = await fetch('/api/auth/logout', { method: 'POST' });
+            const data = await res.json();
+            if (data.success) {
+                router.push('/');
+                router.refresh();
+            }
+        } catch (err) {
+            console.error("Error logging out:", err);
+        }
+    };
+
+    const handleDelete = async (id) => {
+        if (!confirm("Are you sure you want to delete this project?")) return;
+
+        try {
+            const res = await fetch(`/api/projects/${id}`, {
+                method: 'DELETE',
+            });
+            const data = await res.json();
+            if (data.success) {
+                setProjects(projects.filter(p => p._id !== id));
+            } else {
+                alert(data.message || "Failed to delete project");
+            }
+        } catch (err) {
+            console.error("Error deleting project:", err);
+        }
+    };
+
+    // Image compression utility
+    const compressImage = (file) => {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = (event) => {
+                const img = new Image();
+                img.src = event.target.result;
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const MAX_WIDTH = 1000;
+                    let width = img.width;
+                    let height = img.height;
+
+                    if (width > MAX_WIDTH) {
+                        height = Math.round((height * MAX_WIDTH) / width);
+                        width = MAX_WIDTH;
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
+                    resolve(compressedBase64);
+                };
+                img.onerror = (err) => reject(err);
+            };
+            reader.onerror = (err) => reject(err);
+        });
+    };
+
+    const handleImageUpload = async (e) => {
+        const files = Array.from(e.target.files);
+        if (images.length + files.length > 5) {
+            setFormError("You can upload a maximum of 5 images.");
+            return;
+        }
+
+        setFormError('');
+        const compressedList = [];
+        
+        for (let file of files) {
+            try {
+                const compressed = await compressImage(file);
+                compressedList.push(compressed);
+            } catch (err) {
+                console.error("Error compressing image:", err);
+                setFormError("Failed to process one or more images.");
+            }
+        }
+
+        setImages(prev => [...prev, ...compressedList]);
+    };
+
+    const removeImage = (index) => {
+        setImages(prev => prev.filter((_, idx) => idx !== index));
+    };
+
+    const handleAddTech = (e) => {
+        if (e.key === 'Enter' || e.key === ',') {
+            e.preventDefault();
+            const tag = techInput.trim().replace(/,/g, '');
+            if (tag && !technologies.includes(tag)) {
+                setTechnologies([...technologies, tag]);
+            }
+            setTechInput('');
+        }
+    };
+
+    const removeTech = (index) => {
+        setTechnologies(prev => prev.filter((_, idx) => idx !== index));
+    };
+
+    const openAddModal = () => {
+        setEditingId(null);
+        setTitle('');
+        setDescription('');
+        setLink('');
+        setTechnologies([]);
+        setImages([]);
+        setFormError('');
+        setModalOpen(true);
+    };
+
+    const openEditModal = (project) => {
+        setEditingId(project._id);
+        setTitle(project.title);
+        setDescription(project.description);
+        setLink(project.link || '');
+        setTechnologies(project.technologies || []);
+        setImages(project.images || []);
+        setFormError('');
+        setModalOpen(true);
+    };
+
+    const closeModal = () => {
+        setModalOpen(false);
+        // Clear edit query param if any
+        if (searchParams.get('edit')) {
+            router.push('/admin');
+        }
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setFormError('');
+
+        if (images.length < 3 || images.length > 5) {
+            setFormError(`Please provide 3-5 images for the project (current: ${images.length}).`);
+            return;
+        }
+
+        setFormLoading(true);
+        const payload = { title, description, link, technologies, images };
+
+        try {
+            const url = editingId ? `/api/projects/${editingId}` : '/api/projects';
+            const method = editingId ? 'PUT' : 'POST';
+
+            const res = await fetch(url, {
+                method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload),
+            });
+
+            const data = await res.json();
+            if (data.success) {
+                closeModal();
+                fetchProjects();
+            } else {
+                setFormError(data.message || "Failed to save project.");
+            }
+        } catch (err) {
+            setFormError("An error occurred. Please try again.");
+        } finally {
+            setFormLoading(false);
+        }
+    };
+
+    if (loading && !authenticated) {
+        return (
+            <div className="min-h-screen flex flex-col items-center justify-center bg-[#020617]">
+                <div className="w-12 h-12 border-4 border-[#C4F000] border-t-transparent rounded-full animate-spin"></div>
+                <p className="text-gray-400 mt-4 font-medium">Checking authorization...</p>
+            </div>
+        );
+    }
+
+    return (
+        <div className="min-h-screen bg-[#020617] py-12 px-4 sm:px-6 lg:px-8">
+            <div className="max-w-6xl mx-auto">
+                {/* Header */}
+                <div className="flex flex-wrap justify-between items-center bg-zinc-950 border border-zinc-800 rounded-3xl p-6 mb-12 gap-4 shadow-xl">
+                    <div>
+                        <h1 className="text-2xl sm:text-3xl font-extrabold text-white">
+                            Admin <span className="text-[#C4F000]">Dashboard</span>
+                        </h1>
+                        <p className="text-gray-400 text-sm mt-1">Manage and update your portfolio projects.</p>
+                    </div>
+                    <div className="flex items-center gap-3">
+                        <button
+                            onClick={openAddModal}
+                            className="bg-[#C4F000] hover:bg-[#b8dd00] text-black px-5 py-2.5 rounded-full font-bold text-sm transition-all hover:scale-105 flex items-center gap-2"
+                        >
+                            <FaPlus /> Add Project
+                        </button>
+                        <button
+                            onClick={handleLogout}
+                            className="bg-red-950/20 border border-red-500/30 hover:bg-red-950/40 text-red-400 px-4 py-2.5 rounded-full font-bold text-sm transition-all flex items-center gap-2"
+                        >
+                            <FaSignOutAlt /> Log Out
+                        </button>
+                    </div>
+                </div>
+
+                {/* Dashboard stats / welcome info */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+                    <div className="bg-zinc-900/40 border border-zinc-800/80 rounded-2xl p-6">
+                        <p className="text-gray-500 text-xs font-semibold uppercase tracking-wider">Total Projects</p>
+                        <p className="text-4xl font-extrabold text-white mt-2">{projects.length}</p>
+                    </div>
+                    <div className="bg-zinc-900/40 border border-zinc-800/80 rounded-2xl p-6">
+                        <p className="text-gray-500 text-xs font-semibold uppercase tracking-wider">User Status</p>
+                        <p className="text-lg font-bold text-lime-400 mt-2 flex items-center gap-2">
+                            <span className="w-2.5 h-2.5 bg-lime-400 rounded-full animate-pulse"></span>
+                            Logged in as Admin
+                        </p>
+                    </div>
+                    <div className="bg-zinc-900/40 border border-zinc-800/80 rounded-2xl p-6">
+                        <p className="text-gray-500 text-xs font-semibold uppercase tracking-wider">Database Connection</p>
+                        <p className="text-lg font-bold text-blue-400 mt-2 flex items-center gap-2">
+                            <span className="w-2.5 h-2.5 bg-blue-400 rounded-full"></span>
+                            MongoDB Connected
+                        </p>
+                    </div>
+                </div>
+
+                {/* Projects Manager */}
+                <div className="bg-zinc-950 border border-zinc-800 rounded-3xl p-6 sm:p-8 shadow-xl">
+                    <h2 className="text-xl font-bold text-white mb-6">Your Projects</h2>
+                    
+                    {loading ? (
+                        <div className="flex flex-col items-center justify-center py-20">
+                            <div className="w-10 h-10 border-4 border-[#C4F000] border-t-transparent rounded-full animate-spin"></div>
+                        </div>
+                    ) : projects.length === 0 ? (
+                        <div className="text-center py-20 border border-dashed border-zinc-800 rounded-2xl text-gray-500">
+                            <p className="text-lg">No projects added yet.</p>
+                            <button
+                                onClick={openAddModal}
+                                className="text-[#C4F000] hover:underline mt-2 inline-flex items-center gap-1 font-semibold"
+                            >
+                                Create your first project now <FaPlusCircle className="text-xs" />
+                            </button>
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            {projects.map((project) => (
+                                <div
+                                    key={project._id}
+                                    className="bg-zinc-900/50 border border-zinc-850 rounded-2xl p-5 flex flex-col justify-between hover:border-zinc-700 transition-all duration-300 shadow-md group"
+                                >
+                                    <div>
+                                        <div className="relative aspect-video rounded-xl overflow-hidden mb-4 bg-black/40 border border-zinc-800">
+                                            <img
+                                                src={project.images[0] || "/assets/p1.png"}
+                                                alt={project.title}
+                                                className="w-full h-full object-cover"
+                                            />
+                                            <div className="absolute top-2 right-2 bg-black/80 backdrop-blur-sm border border-zinc-800 text-[11px] font-semibold text-gray-300 px-2 py-0.5 rounded-full">
+                                                {project.images.length} Images
+                                            </div>
+                                        </div>
+                                        <h3 className="text-lg font-bold text-white group-hover:text-[#C4F000] transition-colors">{project.title}</h3>
+                                        <p className="text-gray-400 text-xs mt-1.5 line-clamp-2 leading-relaxed">{project.description}</p>
+                                        
+                                        {/* Tags */}
+                                        <div className="flex flex-wrap gap-1.5 mt-3">
+                                            {project.technologies.map((t, idx) => (
+                                                <span key={idx} className="text-[10px] bg-zinc-800 text-gray-400 px-2.5 py-0.5 rounded-full">
+                                                    {t}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    <div className="flex gap-2.5 mt-5 pt-4 border-t border-zinc-850/60">
+                                        <button
+                                            onClick={() => openEditModal(project)}
+                                            className="flex-1 bg-zinc-800 hover:bg-zinc-700 text-white font-bold py-2 px-3 rounded-lg text-xs transition-colors flex items-center justify-center gap-1.5"
+                                        >
+                                            <FaEdit /> Edit
+                                        </button>
+                                        <button
+                                            onClick={() => handleDelete(project._id)}
+                                            className="bg-red-950/20 border border-red-500/30 hover:bg-red-900/30 text-red-400 font-bold py-2 px-3 rounded-lg text-xs transition-colors flex items-center justify-center gap-1.5"
+                                        >
+                                            <FaTrash /> Delete
+                                        </button>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            </div>
+
+            {/* Add/Edit Modal */}
+            <AnimatePresence>
+                {modalOpen && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            onClick={closeModal}
+                            className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+                        />
+
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.95, y: 15 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.95, y: 15 }}
+                            className="relative w-full max-w-2xl bg-zinc-950 border border-zinc-800 rounded-3xl shadow-2xl p-6 sm:p-8 max-h-[90vh] overflow-y-auto z-10"
+                        >
+                            <button
+                                onClick={closeModal}
+                                className="absolute top-5 right-5 p-2 text-gray-500 hover:text-white rounded-full bg-zinc-900 transition-colors border border-zinc-800"
+                            >
+                                <FaTimes />
+                            </button>
+
+                            <h3 className="text-xl sm:text-2xl font-bold text-white mb-6">
+                                {editingId ? "Edit Project" : "Add New Project"}
+                            </h3>
+
+                            {formError && (
+                                <div className="bg-red-950/30 border border-red-500/50 text-red-400 p-4 rounded-2xl text-sm mb-6">
+                                    {formError}
+                                </div>
+                            )}
+
+                            <form onSubmit={handleSubmit} className="space-y-5">
+                                {/* Title */}
+                                <div className="space-y-1.5">
+                                    <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Project Title</label>
+                                    <input
+                                        type="text"
+                                        value={title}
+                                        onChange={(e) => setTitle(e.target.value)}
+                                        placeholder="e.g. Acme SaaS"
+                                        required
+                                        className="w-full bg-zinc-900 border border-zinc-800 hover:border-zinc-700 text-white px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#C4F000]/50 transition-all"
+                                    />
+                                </div>
+
+                                {/* Description */}
+                                <div className="space-y-1.5">
+                                    <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Description</label>
+                                    <textarea
+                                        rows={4}
+                                        value={description}
+                                        onChange={(e) => setDescription(e.target.value)}
+                                        placeholder="Explain the project details and what you delivered..."
+                                        required
+                                        className="w-full bg-zinc-900 border border-zinc-800 hover:border-zinc-700 text-white px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#C4F000]/50 resize-none transition-all"
+                                    />
+                                </div>
+
+                                {/* Live Link */}
+                                <div className="space-y-1.5">
+                                    <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Live URL Link (Optional)</label>
+                                    <div className="relative">
+                                        <span className="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-500 text-sm">
+                                            <FaGlobe />
+                                        </span>
+                                        <input
+                                            type="url"
+                                            value={link}
+                                            onChange={(e) => setLink(e.target.value)}
+                                            placeholder="https://example.com"
+                                            className="w-full bg-zinc-900 border border-zinc-800 hover:border-zinc-700 text-white pl-10 pr-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#C4F000]/50 transition-all"
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* Technology Tags selection widget */}
+                                <div className="space-y-1.5">
+                                    <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Technologies (Type tag and hit Enter)</label>
+                                    <div className="w-full bg-zinc-900 border border-zinc-800 hover:border-zinc-700 rounded-xl p-2.5 flex flex-wrap gap-1.5 items-center">
+                                        {technologies.map((tech, idx) => (
+                                            <span
+                                                key={idx}
+                                                className="text-xs bg-zinc-800 border border-zinc-750 text-white px-2.5 py-1 rounded-full flex items-center gap-1.5"
+                                            >
+                                                {tech}
+                                                <button
+                                                    type="button"
+                                                    onClick={() => removeTech(idx)}
+                                                    className="text-gray-500 hover:text-red-400 transition-colors"
+                                                >
+                                                    <FaTimes className="text-[10px]" />
+                                                </button>
+                                            </span>
+                                        ))}
+                                        <input
+                                            type="text"
+                                            value={techInput}
+                                            onChange={(e) => setTechInput(e.target.value)}
+                                            onKeyDown={handleAddTech}
+                                            placeholder={technologies.length === 0 ? "e.g. NextJS, Tailwind, MongoDB" : "Add tag..."}
+                                            className="bg-transparent text-white border-none outline-none focus:ring-0 text-sm flex-1 min-w-[100px] py-0.5"
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* Dynamic Image Upload */}
+                                <div className="space-y-2.5">
+                                    <div className="flex justify-between items-center">
+                                        <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Project Images (Need 3 to 5 images)</label>
+                                        <span className="text-[11px] font-bold text-gray-500">
+                                            {images.length} / 5 Images
+                                        </span>
+                                    </div>
+
+                                    {/* Upload Trigger Area */}
+                                    {images.length < 5 && (
+                                        <div
+                                            onClick={() => fileInputRef.current?.click()}
+                                            className="border-2 border-dashed border-zinc-800 hover:border-[#C4F000]/60 bg-zinc-900/30 rounded-2xl py-6 flex flex-col items-center justify-center gap-2 cursor-pointer transition-colors"
+                                        >
+                                            <FaImage className="text-2xl text-gray-500" />
+                                            <span className="text-xs text-gray-400 font-medium">Click to select files to upload & compress</span>
+                                            <span className="text-[10px] text-gray-600">Supports JPEG, PNG</span>
+                                            <input
+                                                type="file"
+                                                ref={fileInputRef}
+                                                onChange={handleImageUpload}
+                                                multiple
+                                                accept="image/*"
+                                                className="hidden"
+                                            />
+                                        </div>
+                                    )}
+
+                                    {/* Uploaded Images Previews Carousel / grid list */}
+                                    {images.length > 0 && (
+                                        <div className="grid grid-cols-3 sm:grid-cols-5 gap-3.5 mt-2">
+                                            {images.map((img, idx) => (
+                                                <div
+                                                    key={idx}
+                                                    className="relative aspect-video rounded-lg overflow-hidden bg-black/60 border border-zinc-850 group/img"
+                                                >
+                                                    <img
+                                                        src={img}
+                                                        alt={`Preview ${idx + 1}`}
+                                                        className="w-full h-full object-cover"
+                                                    />
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => removeImage(idx)}
+                                                        className="absolute -top-1 -right-1 p-1 bg-red-600 hover:bg-red-500 text-white rounded-full transition-all opacity-0 group-hover/img:opacity-100 scale-90 hover:scale-100 shadow-md"
+                                                    >
+                                                        <FaTimes className="text-[10px]" />
+                                                    </button>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Form actions */}
+                                <div className="flex gap-3 pt-4 border-t border-zinc-900 mt-6">
+                                    <button
+                                        type="button"
+                                        onClick={closeModal}
+                                        className="flex-1 bg-zinc-900 hover:bg-zinc-850 border border-zinc-800 text-white font-bold py-3.5 rounded-xl transition-all text-sm"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        type="submit"
+                                        disabled={formLoading}
+                                        className="flex-1 bg-[#C4F000] hover:bg-[#b8dd00] text-black font-bold py-3.5 rounded-xl transition-all shadow-md shadow-[#C4F000]/10 flex items-center justify-center gap-2 text-sm disabled:opacity-50"
+                                    >
+                                        {formLoading ? (
+                                            <div className="w-5 h-5 border-2 border-black border-t-transparent rounded-full animate-spin"></div>
+                                        ) : (
+                                            editingId ? "Save Changes" : "Create Project"
+                                        )}
+                                    </button>
+                                </div>
+                            </form>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
+        </div>
+    );
+}
+
+export default function AdminDashboard() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen flex flex-col items-center justify-center bg-[#020617]">
+                <div className="w-12 h-12 border-4 border-[#C4F000] border-t-transparent rounded-full animate-spin"></div>
+                <p className="text-gray-400 mt-4 font-medium">Loading Admin Dashboard...</p>
+            </div>
+        }>
+            <AdminDashboardContent />
+        </Suspense>
+    );
+}

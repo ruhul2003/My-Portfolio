@@ -1,17 +1,50 @@
-import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';   // ← Added
+"use client";
+
+import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
 import { FaFacebook, FaLinkedin, FaGithub } from "react-icons/fa";
 import { RiInstagramFill } from "react-icons/ri";
 import { HiMenu, HiX } from "react-icons/hi";
 
 const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false);
-    const location = useLocation();   // ← For active link highlighting
+    const [isAdmin, setIsAdmin] = useState(false);
+    const pathname = usePathname();
+    const router = useRouter();
+
+    // Check auth status on mount or pathname change
+    useEffect(() => {
+        const checkAuth = async () => {
+            try {
+                const res = await fetch('/api/auth/status');
+                const data = await res.json();
+                setIsAdmin(data.authenticated);
+            } catch (err) {
+                setIsAdmin(false);
+            }
+        };
+        checkAuth();
+    }, [pathname]);
 
     // Helper function to check active route
     const isActive = (path) => {
-        if (path === '/') return location.pathname === '/';
-        return location.pathname.startsWith(path);
+        if (path === '/') return pathname === '/';
+        return pathname.startsWith(path);
+    };
+
+    const handleLogout = async () => {
+        try {
+            const res = await fetch('/api/auth/logout', { method: 'POST' });
+            const data = await res.json();
+            if (data.success) {
+                setIsAdmin(false);
+                router.push('/');
+                router.refresh();
+            }
+        } catch (err) {
+            console.error('Logout error:', err);
+        }
     };
 
     return (
@@ -22,15 +55,15 @@ const Navbar = () => {
             <nav className="w-11/12 md:w-9/12 mx-auto py-5 flex justify-between items-center text-white">
 
                 {/* Logo - Link to Home */}
-                <Link to="/" className="text-3xl md:text-4xl font-extrabold text-[#C4F000]">
+                <Link href="/" className="text-3xl md:text-4xl font-extrabold text-[#C4F000]">
                     Ruhul.
                 </Link>
 
                 {/* Desktop Menu */}
-                <ul className="hidden md:flex gap-8 text-[16px]">
+                <ul className="hidden md:flex gap-8 text-[16px] items-center">
                     <li>
                         <Link
-                            to="/"
+                            href="/"
                             className={`hover:text-[#C4F000] cursor-pointer transition-colors 
                                 ${isActive('/') ? 'text-[#C4F000]' : ''}`}
                         >
@@ -39,7 +72,7 @@ const Navbar = () => {
                     </li>
                     <li>
                         <Link
-                            to="/about"
+                            href="/about"
                             className={`hover:text-[#C4F000] cursor-pointer transition-colors 
                                 ${isActive('/about') ? 'text-[#C4F000]' : ''}`}
                         >
@@ -48,7 +81,7 @@ const Navbar = () => {
                     </li>
                     <li>
                         <Link
-                            to="/projects"
+                            href="/projects"
                             className={`hover:text-[#C4F000] cursor-pointer transition-colors 
                                 ${isActive('/projects') ? 'text-[#C4F000]' : ''}`}
                         >
@@ -57,7 +90,7 @@ const Navbar = () => {
                     </li>
                     <li>
                         <Link
-                            to="/services"
+                            href="/services"
                             className={`hover:text-[#C4F000] cursor-pointer transition-colors 
                                 ${isActive('/services') ? 'text-[#C4F000]' : ''}`}
                         >
@@ -66,18 +99,28 @@ const Navbar = () => {
                     </li>
                     <li>
                         <Link
-                            to="/contact"
+                            href="/contact"
                             className={`hover:text-[#C4F000] cursor-pointer transition-colors 
                                 ${isActive('/contact') ? 'text-[#C4F000]' : ''}`}
                         >
                             Contact
                         </Link>
                     </li>
+                    {isAdmin && (
+                        <li>
+                            <Link
+                                href="/admin"
+                                className={`hover:text-[#C4F000] cursor-pointer transition-colors font-semibold px-3 py-1 rounded border border-[#C4F000]/30 bg-[#C4F000]/10
+                                    ${isActive('/admin') ? 'text-[#C4F000] border-[#C4F000]' : 'text-lime-300'}`}
+                            >
+                                Admin
+                            </Link>
+                        </li>
+                    )}
                 </ul>
 
-                {/* Desktop Social */}
-                <div className="hidden md:flex gap-5 text-xl">
-
+                {/* Desktop Social & Auth */}
+                <div className="hidden md:flex gap-5 text-xl items-center">
                     <a
                         href="https://www.facebook.com/imtiaz.hossain.908347"
                         target="_blank"
@@ -110,6 +153,21 @@ const Navbar = () => {
                         <FaGithub className="hover:text-[#C4F000] cursor-pointer transition-colors" />
                     </a>
 
+                    {isAdmin ? (
+                        <button
+                            onClick={handleLogout}
+                            className="ml-4 text-xs font-semibold text-red-400 hover:text-red-300 border border-red-400/30 px-3 py-1 rounded bg-red-950/20 hover:bg-red-950/40 transition-all duration-200"
+                        >
+                            Logout
+                        </button>
+                    ) : (
+                        <Link
+                            href="/admin/login"
+                            className="ml-4 text-xs font-semibold text-gray-400 hover:text-white border border-gray-600 px-3 py-1 rounded hover:bg-gray-800 transition-all duration-200"
+                        >
+                            Login
+                        </Link>
+                    )}
                 </div>
 
                 {/* Mobile Button */}
@@ -128,7 +186,7 @@ const Navbar = () => {
                 <ul className="flex flex-col items-center gap-6 text-lg">
                     <li>
                         <Link
-                            to="/"
+                            href="/"
                             className={`hover:text-[#C4F000] cursor-pointer transition-colors 
                                 ${isActive('/') ? 'text-[#C4F000]' : ''}`}
                             onClick={() => setIsOpen(false)}
@@ -138,7 +196,7 @@ const Navbar = () => {
                     </li>
                     <li>
                         <Link
-                            to="/about"
+                            href="/about"
                             className={`hover:text-[#C4F000] cursor-pointer transition-colors 
                                 ${isActive('/about') ? 'text-[#C4F000]' : ''}`}
                             onClick={() => setIsOpen(false)}
@@ -148,7 +206,7 @@ const Navbar = () => {
                     </li>
                     <li>
                         <Link
-                            to="/projects"
+                            href="/projects"
                             className={`hover:text-[#C4F000] cursor-pointer transition-colors 
                                 ${isActive('/projects') ? 'text-[#C4F000]' : ''}`}
                             onClick={() => setIsOpen(false)}
@@ -158,7 +216,7 @@ const Navbar = () => {
                     </li>
                     <li>
                         <Link
-                            to="/services"
+                            href="/services"
                             className={`hover:text-[#C4F000] cursor-pointer transition-colors 
                                 ${isActive('/services') ? 'text-[#C4F000]' : ''}`}
                             onClick={() => setIsOpen(false)}
@@ -168,13 +226,45 @@ const Navbar = () => {
                     </li>
                     <li>
                         <Link
-                            to="/contact"
+                            href="/contact"
                             className={`hover:text-[#C4F000] cursor-pointer transition-colors 
                                 ${isActive('/contact') ? 'text-[#C4F000]' : ''}`}
                             onClick={() => setIsOpen(false)}
                         >
                             Contact
                         </Link>
+                    </li>
+                    {isAdmin && (
+                        <li>
+                            <Link
+                                href="/admin"
+                                className="text-lime-300 hover:text-[#C4F000]"
+                                onClick={() => setIsOpen(false)}
+                            >
+                                Admin Dashboard
+                            </Link>
+                        </li>
+                    )}
+                    <li>
+                        {isAdmin ? (
+                            <button
+                                onClick={() => {
+                                    handleLogout();
+                                    setIsOpen(false);
+                                }}
+                                className="text-red-400 font-semibold"
+                            >
+                                Logout
+                            </button>
+                        ) : (
+                            <Link
+                                href="/admin/login"
+                                className="text-gray-400 font-semibold"
+                                onClick={() => setIsOpen(false)}
+                            >
+                                Admin Login
+                            </Link>
+                        )}
                     </li>
                 </ul>
 

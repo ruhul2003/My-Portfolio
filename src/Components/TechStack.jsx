@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState } from 'react';
 import { TbBrandJavascript } from "react-icons/tb";
 import { FaPython } from "react-icons/fa";

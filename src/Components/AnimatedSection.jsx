@@ -1,30 +1,62 @@
-// src/Components/AnimatedSection.jsx
+"use client";
+
 import { motion } from 'framer-motion';
 
-const AnimatedSection = ({ children, direction = "up", delay = 0 }) => {
+const AnimatedSection = ({ children, direction = "up", delay = 0, duration = 0.8 }) => {
+  const springTransition = {
+    type: "spring",
+    stiffness: 50,
+    damping: 15,
+    mass: 1,
+    delay: delay,
+  };
+
   const variants = {
     up: {
-      initial: { opacity: 0, y: 40 },
+      initial: { opacity: 0, y: 50 },
       animate: { 
         opacity: 1, 
         y: 0,
-        transition: { duration: 0.6, ease: "easeOut", delay }
+        transition: springTransition
+      }
+    },
+    down: {
+      initial: { opacity: 0, y: -50 },
+      animate: { 
+        opacity: 1, 
+        y: 0,
+        transition: springTransition
       }
     },
     left: {
-      initial: { opacity: 0, x: -60 },
+      initial: { opacity: 0, x: -50 },
       animate: { 
         opacity: 1, 
         x: 0,
-        transition: { duration: 0.6, ease: "easeOut", delay }
+        transition: springTransition
       }
     },
     right: {
-      initial: { opacity: 0, x: 60 },
+      initial: { opacity: 0, x: 50 },
       animate: { 
         opacity: 1, 
         x: 0,
-        transition: { duration: 0.6, ease: "easeOut", delay }
+        transition: springTransition
+      }
+    },
+    fade: {
+      initial: { opacity: 0 },
+      animate: { 
+        opacity: 1,
+        transition: { duration, ease: "easeInOut", delay }
+      }
+    },
+    scale: {
+      initial: { opacity: 0, scale: 0.92 },
+      animate: { 
+        opacity: 1, 
+        scale: 1,
+        transition: springTransition
       }
     }
   };
@@ -33,7 +65,7 @@ const AnimatedSection = ({ children, direction = "up", delay = 0 }) => {
     <motion.div
       initial="initial"
       whileInView="animate"
-      viewport={{ once: true }}     // Important: Runs only once
+      viewport={{ once: true, margin: "-80px" }}
       variants={variants[direction]}
     >
       {children}
