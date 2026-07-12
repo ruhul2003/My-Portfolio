@@ -156,7 +156,7 @@ const Education = () => {
                             <p className="text-lg">No education or experience cards found.</p>
                         </div>
                     ) : (
-                        <motion.div 
+                        <motion.div
                             variants={containerVariants}
                             initial="hidden"
                             whileInView="visible"
@@ -165,24 +165,23 @@ const Education = () => {
                         >
                             <AnimatePresence mode="popLayout">
                                 {timelineItems.map((item) => {
-                                    const isEducation = item.role.toLowerCase().includes('student') || 
-                                                        item.role.toLowerCase().includes('b.sc') || 
-                                                        item.role.toLowerCase().includes('m.sc') || 
-                                                        item.role.toLowerCase().includes('graduate') ||
-                                                        item.company.toLowerCase().includes('university') ||
-                                                        item.company.toLowerCase().includes('school');
+                                    const isEducation = item.role.toLowerCase().includes('student') ||
+                                        item.role.toLowerCase().includes('b.sc') ||
+                                        item.role.toLowerCase().includes('m.sc') ||
+                                        item.role.toLowerCase().includes('graduate') ||
+                                        item.company.toLowerCase().includes('university') ||
+                                        item.company.toLowerCase().includes('school');
 
                                     return (
                                         <motion.div
                                             key={item._id}
                                             layout
                                             variants={cardVariants}
-                                            whileHover={{ y: -6, borderColor: "rgba(196, 240, 0, 0.4)", backgroundColor: "rgba(24, 24, 27, 0.2)" }}
+                                            whileHover={{ y: -6, borderColor: "rgba(196, 240, 0, 0.5)", backgroundColor: "rgba(24, 24, 27, 0.2)" }}
                                             className="bg-zinc-900/10 backdrop-blur-sm border border-[#C4F000]/20 p-6 sm:p-8 rounded-3xl flex flex-col justify-between group transition-all duration-300 relative"
                                         >
                                             <div>
                                                 <div className="flex justify-between items-center">
-                                                    {/* Date Range Badge */}
                                                     <span className="bg-zinc-950 border border-zinc-800 text-[#D4FF00] px-3.5 py-1 rounded-full text-[11px] font-bold tracking-wider uppercase">
                                                         {item.year}
                                                     </span>
@@ -200,7 +199,7 @@ const Education = () => {
                                                 <h3 className="text-xl font-bold tracking-tight text-white mt-5 group-hover:text-[#D4FF00] transition-colors duration-300">
                                                     {item.company}
                                                 </h3>
-                                                
+
                                                 <p className="text-sm font-semibold text-gray-400 mt-1">
                                                     {item.role}
                                                 </p>
@@ -252,7 +251,7 @@ const Education = () => {
                     ) : certifications.length === 0 ? (
                         <p className="text-gray-500 text-center py-10 font-light border border-dashed border-zinc-800 rounded-2xl">No certifications or awards listed.</p>
                     ) : (
-                        <motion.div 
+                        <motion.div
                             variants={containerVariants}
                             initial="hidden"
                             whileInView="visible"
@@ -282,7 +281,7 @@ const Education = () => {
 
                                             <h3 className="text-lg font-bold text-white mt-5 group-hover:text-[#D4FF00] transition-colors">{cert.title}</h3>
                                             <p className="text-xs font-semibold text-gray-400 mt-1">{cert.issuer}</p>
-                                            
+
                                             {cert.description && (
                                                 <p className="text-xs text-gray-500 mt-3 font-light leading-relaxed">{cert.description}</p>
                                             )}
@@ -290,10 +289,10 @@ const Education = () => {
 
                                         <div className="flex justify-between items-center mt-6 pt-4 border-t border-zinc-900/60">
                                             {cert.link ? (
-                                                <a 
-                                                    href={cert.link} 
-                                                    target="_blank" 
-                                                    rel="noopener noreferrer" 
+                                                <a
+                                                    href={cert.link}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
                                                     className="inline-flex items-center gap-1.5 text-xs text-gray-400 hover:text-white font-medium transition-colors"
                                                 >
                                                     Verify Credential <FaExternalLinkAlt className="text-[10px]" />
