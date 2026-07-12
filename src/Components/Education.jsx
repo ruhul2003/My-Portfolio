@@ -177,8 +177,8 @@ const Education = () => {
                                             key={item._id}
                                             layout
                                             variants={cardVariants}
-                                            whileHover={{ y: -6, borderColor: "rgba(196, 240, 0, 0.3)", backgroundColor: "rgba(24, 24, 27, 0.2)" }}
-                                            className="bg-zinc-900/10 backdrop-blur-sm border border-zinc-850 p-6 sm:p-8 rounded-3xl flex flex-col justify-between group transition-all duration-300 relative"
+                                            whileHover={{ y: -6, borderColor: "rgba(196, 240, 0, 0.4)", backgroundColor: "rgba(24, 24, 27, 0.2)" }}
+                                            className="bg-zinc-900/10 backdrop-blur-sm border border-[#C4F000]/20 p-6 sm:p-8 rounded-3xl flex flex-col justify-between group transition-all duration-300 relative"
                                         >
                                             <div>
                                                 <div className="flex justify-between items-center">
@@ -265,8 +265,8 @@ const Education = () => {
                                         key={cert._id}
                                         layout
                                         variants={cardVariants}
-                                        whileHover={{ y: -6, borderColor: "rgba(196, 240, 0, 0.3)", backgroundColor: "rgba(25, 25, 25, 0.2)" }}
-                                        className="bg-zinc-900/10 backdrop-blur-sm border border-zinc-850 p-6 sm:p-8 rounded-3xl flex flex-col justify-between group transition-all duration-300 relative"
+                                        whileHover={{ y: -6, borderColor: "rgba(196, 240, 0, 0.4)", backgroundColor: "rgba(25, 25, 25, 0.2)" }}
+                                        className="bg-zinc-900/10 backdrop-blur-sm border border-[#C4F000]/20 p-6 sm:p-8 rounded-3xl flex flex-col justify-between group transition-all duration-300 relative"
                                     >
                                         <div>
                                             <div className="flex justify-between items-start">
