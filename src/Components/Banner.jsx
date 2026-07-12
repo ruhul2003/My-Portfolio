@@ -48,7 +48,7 @@ const Banner = () => {
     };
 
     return (
-        <section className="min-h-screen overflow-hidden w-full flex items-center text-white px-6 sm:px-12 md:px-20 relative">
+        <section className="min-h-screen overflow-hidden w-full flex items-center text-white px-6 sm:px-12 md:px-20 pb-28 md:pb-24 relative">
             {/* Decorative ambient background glows */}
             <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-[#C4F000]/5 rounded-full blur-[120px] pointer-events-none -translate-x-1/2 -translate-y-1/2"></div>
             <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-indigo-500/5 rounded-full blur-[100px] pointer-events-none translate-x-1/2 translate-y-1/2"></div>
@@ -120,6 +120,42 @@ const Banner = () => {
                     </motion.div>
                 </motion.div>
 
+            </div>
+
+            {/* Infinite Scrolling Marquee at the very bottom */}
+            <div className="absolute bottom-0 left-0 w-full bg-zinc-950/40 border-t border-zinc-900/60 py-5 overflow-hidden backdrop-blur-xs select-none">
+                <div className="animate-marquee flex gap-16 text-[10px] sm:text-xs font-bold tracking-[0.25em] uppercase text-zinc-500">
+                    {/* Half 1 */}
+                    <div className="flex gap-16 shrink-0 items-center">
+                        <span>Full Stack Web Developer</span>
+                        <span className="text-[#C4F000]">•</span>
+                        <span>Next.js & React Expert</span>
+                        <span className="text-[#C4F000]">•</span>
+                        <span>UI/UX Designer</span>
+                        <span className="text-[#C4F000]">•</span>
+                        <span>Node.js Backend Specialist</span>
+                        <span className="text-[#C4F000]">•</span>
+                        <span>Clean Code Architect</span>
+                        <span className="text-[#C4F000]">•</span>
+                        <span>Framer Motion Animations</span>
+                        <span className="text-[#C4F000]">•</span>
+                    </div>
+                    {/* Half 2 (identical duplicate) */}
+                    <div className="flex gap-16 shrink-0 items-center">
+                        <span>Full Stack Web Developer</span>
+                        <span className="text-[#C4F000]">•</span>
+                        <span>Next.js & React Expert</span>
+                        <span className="text-[#C4F000]">•</span>
+                        <span>UI/UX Designer</span>
+                        <span className="text-[#C4F000]">•</span>
+                        <span>Node.js Backend Specialist</span>
+                        <span className="text-[#C4F000]">•</span>
+                        <span>Clean Code Architect</span>
+                        <span className="text-[#C4F000]">•</span>
+                        <span>Framer Motion Animations</span>
+                        <span className="text-[#C4F000]">•</span>
+                    </div>
+                </div>
             </div>
         </section>
     );
