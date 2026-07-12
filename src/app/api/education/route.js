@@ -41,16 +41,22 @@ const defaultEducation = [
   }
 ];
 
+import SystemSetting from '@/models/SystemSetting';
+
 // GET all education entries
 export async function GET() {
   try {
     await dbConnect();
     let entries = await Education.find({}).sort({ order: 1, createdAt: -1 });
 
-    // Seed if empty
-    if (entries.length === 0) {
+    // Seed if never seeded before
+    const hasSeeded = await SystemSetting.findOne({ key: 'seeded_education' });
+    if (entries.length === 0 && !hasSeeded) {
       await Education.insertMany(defaultEducation);
+      await SystemSetting.create({ key: 'seeded_education', value: 'true' });
       entries = await Education.find({}).sort({ order: 1, createdAt: -1 });
+    } else if (entries.length > 0 && !hasSeeded) {
+      await SystemSetting.create({ key: 'seeded_education', value: 'true' });
     }
 
     return NextResponse.json({ success: true, data: entries }, { status: 200 });

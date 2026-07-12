@@ -55,16 +55,22 @@ const defaultProjects = [
   },
 ];
 
+import SystemSetting from '@/models/SystemSetting';
+
 // GET all projects
 export async function GET() {
   try {
     await dbConnect();
     let projects = await Project.find({}).sort({ createdAt: -1 });
     
-    // Seed default projects if none exist
-    if (projects.length === 0) {
+    // Seed default projects if never seeded before
+    const hasSeeded = await SystemSetting.findOne({ key: 'seeded_projects' });
+    if (projects.length === 0 && !hasSeeded) {
       await Project.insertMany(defaultProjects);
+      await SystemSetting.create({ key: 'seeded_projects', value: 'true' });
       projects = await Project.find({}).sort({ createdAt: -1 });
+    } else if (projects.length > 0 && !hasSeeded) {
+      await SystemSetting.create({ key: 'seeded_projects', value: 'true' });
     }
     
     return NextResponse.json({ success: true, data: projects }, { status: 200 });

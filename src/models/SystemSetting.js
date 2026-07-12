@@ -1,0 +1,19 @@
+import mongoose from 'mongoose';
+
+const SystemSettingSchema = new mongoose.Schema({
+  key: {
+    type: String,
+    required: true,
+    unique: true,
+  },
+  value: {
+    type: String,
+    required: true,
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+});
+
+export default mongoose.models.SystemSetting || mongoose.model('SystemSetting', SystemSettingSchema);

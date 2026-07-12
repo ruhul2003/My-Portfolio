@@ -47,16 +47,22 @@ const defaultCertifications = [
   }
 ];
 
+import SystemSetting from '@/models/SystemSetting';
+
 // GET all certifications and awards
 export async function GET() {
   try {
     await dbConnect();
     let entries = await Certification.find({}).sort({ order: 1, createdAt: -1 });
 
-    // Seed if empty
-    if (entries.length === 0) {
+    // Seed if never seeded before
+    const hasSeeded = await SystemSetting.findOne({ key: 'seeded_certifications' });
+    if (entries.length === 0 && !hasSeeded) {
       await Certification.insertMany(defaultCertifications);
+      await SystemSetting.create({ key: 'seeded_certifications', value: 'true' });
       entries = await Certification.find({}).sort({ order: 1, createdAt: -1 });
+    } else if (entries.length > 0 && !hasSeeded) {
+      await SystemSetting.create({ key: 'seeded_certifications', value: 'true' });
     }
 
     return NextResponse.json({ success: true, data: entries }, { status: 200 });
