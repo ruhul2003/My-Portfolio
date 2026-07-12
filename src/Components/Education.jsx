@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaEdit, FaTrash, FaPlus, FaPlusCircle, FaAward, FaCertificate, FaExternalLinkAlt, FaBriefcase, FaGraduationCap } from 'react-icons/fa';
+import { FaEdit, FaTrash, FaPlus, FaAward, FaCertificate, FaExternalLinkAlt, FaBriefcase, FaGraduationCap } from 'react-icons/fa';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
@@ -45,7 +45,7 @@ const Education = () => {
 
     const handleDeleteEdu = async (id, e) => {
         e.stopPropagation();
-        if (!confirm("Are you sure you want to delete this timeline entry?")) return;
+        if (!confirm("Are you sure you want to delete this entry?")) return;
         try {
             const res = await fetch(`/api/education/${id}`, { method: 'DELETE' });
             const data = await res.json();
@@ -84,7 +84,7 @@ const Education = () => {
         hidden: {},
         visible: {
             transition: {
-                staggerChildren: 0.12
+                staggerChildren: 0.1
             }
         }
     };
@@ -98,33 +98,6 @@ const Education = () => {
                 type: "spring",
                 stiffness: 70,
                 damping: 15
-            }
-        }
-    };
-
-    const timelineItemVariants = {
-        hidden: { opacity: 0, x: -30 },
-        visible: {
-            opacity: 1,
-            x: 0,
-            transition: {
-                type: "spring",
-                stiffness: 70,
-                damping: 15
-            }
-        }
-    };
-
-    const dotVariants = {
-        hidden: { scale: 0, opacity: 0 },
-        visible: {
-            scale: 1,
-            opacity: 1,
-            transition: {
-                type: "spring",
-                stiffness: 200,
-                damping: 10,
-                delay: 0.15
             }
         }
     };
@@ -166,17 +139,21 @@ const Education = () => {
                 </div>
             </div>
 
-            {/* Main Timeline Section */}
+            {/* main Cards Grid Section */}
             <div className="bg-transparent text-white mt-20 pb-20 px-6 md:px-12 lg:px-20 border-b border-zinc-900/60">
-                <div className="max-w-4xl mx-auto">
+                <div className="max-w-6xl mx-auto">
+                    <h2 className="text-3xl font-extrabold text-white mb-10 tracking-tight">
+                        Experience & Timeline
+                    </h2>
+
                     {loading ? (
                         <div className="flex flex-col items-center justify-center py-20">
                             <div className="w-10 h-10 border-4 border-[#C4F000] border-t-transparent rounded-full animate-spin"></div>
-                            <p className="text-gray-500 mt-4 font-light">Loading timeline...</p>
+                            <p className="text-gray-500 mt-4 font-light">Loading cards...</p>
                         </div>
                     ) : timelineItems.length === 0 ? (
                         <div className="text-center py-20 border border-dashed border-zinc-800 rounded-2xl text-gray-500">
-                            <p className="text-lg">No education or experience timeline items found.</p>
+                            <p className="text-lg">No education or experience cards found.</p>
                         </div>
                     ) : (
                         <motion.div 
@@ -184,79 +161,77 @@ const Education = () => {
                             initial="hidden"
                             whileInView="visible"
                             viewport={{ once: true, margin: "-100px" }}
-                            className="relative border-l-2 border-zinc-850 pl-8 md:pl-12 space-y-12"
+                            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
                         >
                             <AnimatePresence mode="popLayout">
-                                {timelineItems.map((item) => (
-                                    <motion.div
-                                        key={item._id}
-                                        layout
-                                        variants={timelineItemVariants}
-                                        initial={{ opacity: 0, x: -30 }}
-                                        animate={{ opacity: 1, x: 0 }}
-                                        exit={{ opacity: 0, x: -30 }}
-                                        className="relative group"
-                                    >
-                                        {/* Timeline Bullet Node */}
-                                        <motion.div 
-                                            variants={dotVariants}
-                                            className="absolute -left-[41px] md:-left-[57px] top-8 w-4 h-4 rounded-full bg-[#020617] border-2 border-[#D4FF00] z-10 transition-colors duration-300 group-hover:bg-[#D4FF00]"
-                                        />
+                                {timelineItems.map((item) => {
+                                    const isEducation = item.role.toLowerCase().includes('student') || 
+                                                        item.role.toLowerCase().includes('b.sc') || 
+                                                        item.role.toLowerCase().includes('m.sc') || 
+                                                        item.role.toLowerCase().includes('graduate') ||
+                                                        item.company.toLowerCase().includes('university') ||
+                                                        item.company.toLowerCase().includes('school');
 
-                                        {/* Content Card (Professional Box Layout) */}
+                                    return (
                                         <motion.div
-                                            whileHover={{ y: -4, borderColor: "rgba(196, 240, 0, 0.25)", backgroundColor: "rgba(24, 24, 27, 0.4)" }}
-                                            className="bg-zinc-900/20 backdrop-blur-sm border border-zinc-850 p-6 sm:p-8 rounded-3xl transition-all duration-300 relative"
+                                            key={item._id}
+                                            layout
+                                            variants={cardVariants}
+                                            whileHover={{ y: -6, borderColor: "rgba(196, 240, 0, 0.3)", backgroundColor: "rgba(24, 24, 27, 0.2)" }}
+                                            className="bg-zinc-900/10 backdrop-blur-sm border border-zinc-850 p-6 sm:p-8 rounded-3xl flex flex-col justify-between group transition-all duration-300 relative"
                                         >
-                                            {/* Top info and header */}
-                                            <div className={`flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 ${isAdmin ? 'pr-16' : ''}`}>
-                                                {/* Date Range Pill */}
-                                                <span className="bg-zinc-900 border border-zinc-800 text-[#D4FF00] px-4 py-1 rounded-full text-xs font-semibold tracking-wider whitespace-nowrap self-start">
-                                                    {item.year}
-                                                </span>
+                                            <div>
+                                                <div className="flex justify-between items-center">
+                                                    {/* Date Range Badge */}
+                                                    <span className="bg-zinc-950 border border-zinc-800 text-[#D4FF00] px-3.5 py-1 rounded-full text-[11px] font-bold tracking-wider uppercase">
+                                                        {item.year}
+                                                    </span>
 
-                                                <div className="flex items-center gap-1.5 text-gray-400 text-sm">
-                                                    {item.role.toLowerCase().includes('developer') || item.role.toLowerCase().includes('designer') ? (
-                                                        <FaBriefcase className="text-zinc-650" />
-                                                    ) : (
-                                                        <FaGraduationCap className="text-zinc-650" />
-                                                    )}
-                                                    <span className="font-semibold text-gray-300">{item.role}</span>
+                                                    {/* Work or School Icon Indicator */}
+                                                    <div className="p-2 bg-zinc-950 border border-zinc-850 rounded-xl">
+                                                        {isEducation ? (
+                                                            <FaGraduationCap className="text-sm text-indigo-400" />
+                                                        ) : (
+                                                            <FaBriefcase className="text-sm text-[#C4F000]" />
+                                                        )}
+                                                    </div>
                                                 </div>
+
+                                                <h3 className="text-xl font-bold tracking-tight text-white mt-5 group-hover:text-[#D4FF00] transition-colors duration-300">
+                                                    {item.company}
+                                                </h3>
+                                                
+                                                <p className="text-sm font-semibold text-gray-400 mt-1">
+                                                    {item.role}
+                                                </p>
+
+                                                <p className="mt-4 text-gray-500 leading-relaxed text-xs font-light">
+                                                    {item.description}
+                                                </p>
                                             </div>
 
-                                            {/* Institution/Company Name */}
-                                            <h3 className="text-2xl font-bold tracking-tight text-white mt-4 group-hover:text-[#D4FF00] transition-colors duration-300">
-                                                {item.company}
-                                            </h3>
-
-                                            {/* Description text */}
-                                            <p className="mt-4 text-gray-400 leading-relaxed text-[15px] font-light">
-                                                {item.description}
-                                            </p>
-
-                                            {/* Admin Actions Container (Neat top-right inside card) */}
+                                            {/* Admin Controls (Align neatly inside card bottom right) */}
                                             {isAdmin && (
-                                                <div className="absolute top-6 right-6 flex gap-2">
+                                                <div className="flex justify-end gap-2 mt-6 pt-4 border-t border-zinc-900/60">
                                                     <button
                                                         onClick={(e) => handleEditRedirect(item._id, 'education', e)}
-                                                        className="p-2.5 bg-zinc-950 hover:bg-blue-600 text-gray-500 hover:text-white border border-zinc-850 hover:border-blue-500 rounded-xl transition-all shadow-md"
-                                                        title="Edit Entry"
+                                                        className="p-2.5 bg-zinc-950 hover:bg-blue-600 text-gray-500 hover:text-white border border-zinc-850 rounded-xl transition-all"
+                                                        title="Edit"
                                                     >
                                                         <FaEdit className="text-xs" />
                                                     </button>
                                                     <button
                                                         onClick={(e) => handleDeleteEdu(item._id, e)}
-                                                        className="p-2.5 bg-zinc-950 hover:bg-red-650 text-gray-500 hover:text-white border border-zinc-850 hover:border-red-500 rounded-xl transition-all shadow-md"
-                                                        title="Delete Entry"
+                                                        className="p-2.5 bg-zinc-950 hover:bg-red-650 text-gray-500 hover:text-white border border-zinc-850 rounded-xl transition-all"
+                                                        title="Delete"
                                                     >
                                                         <FaTrash className="text-xs" />
                                                     </button>
                                                 </div>
                                             )}
                                         </motion.div>
-                                    </motion.div>
-                                ))}
+                                    );
+                                })}
                             </AnimatePresence>
                         </motion.div>
                     )}
@@ -265,7 +240,7 @@ const Education = () => {
 
             {/* Certifications & Awards Section */}
             <div className="mt-20 px-6 md:px-12 lg:px-20 pb-20">
-                <div className="max-w-4xl mx-auto">
+                <div className="max-w-6xl mx-auto">
                     <h2 className="text-3xl font-extrabold text-white mb-10 tracking-tight flex items-center gap-3">
                         Certifications & Awards
                     </h2>
@@ -282,7 +257,7 @@ const Education = () => {
                             initial="hidden"
                             whileInView="visible"
                             viewport={{ once: true, margin: "-50px" }}
-                            className="grid grid-cols-1 md:grid-cols-2 gap-6"
+                            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
                         >
                             <AnimatePresence mode="popLayout">
                                 {certifications.map((cert) => (
@@ -305,7 +280,7 @@ const Education = () => {
                                                 <span className="text-xs text-gray-500 font-semibold">{cert.year}</span>
                                             </div>
 
-                                            <h3 className="text-lg font-bold text-white mt-5 group-hover:text-[#C4F000] transition-colors">{cert.title}</h3>
+                                            <h3 className="text-lg font-bold text-white mt-5 group-hover:text-[#D4FF00] transition-colors">{cert.title}</h3>
                                             <p className="text-xs font-semibold text-gray-400 mt-1">{cert.issuer}</p>
                                             
                                             {cert.description && (
