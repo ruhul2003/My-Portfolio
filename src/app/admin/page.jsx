@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaTrash, FaEdit, FaPlus, FaSignOutAlt, FaImage, FaTimes, FaGlobe, FaBriefcase, FaGraduationCap } from 'react-icons/fa';
+import { FaTrash, FaEdit, FaPlus, FaSignOutAlt, FaImage, FaTimes, FaGlobe, FaBriefcase, FaAward, FaCertificate } from 'react-icons/fa';
 
 function AdminDashboardContent() {
     const router = useRouter();
@@ -11,16 +11,17 @@ function AdminDashboardContent() {
     const [authenticated, setAuthenticated] = useState(false);
     const [loading, setLoading] = useState(true);
     
-    // Tab State: 'projects' or 'education'
+    // Tab State: 'projects', 'education', or 'certifications'
     const [activeTab, setActiveTab] = useState('projects');
     
     // List States
     const [projects, setProjects] = useState([]);
     const [educationItems, setEducationItems] = useState([]);
+    const [certificationItems, setCertificationItems] = useState([]);
     
     // Single Modal configuration
     const [modalOpen, setModalOpen] = useState(false);
-    const [modalType, setModalType] = useState('project'); // 'project' or 'education'
+    const [modalType, setModalType] = useState('project'); // 'project', 'education', or 'certification'
     const [editingId, setEditingId] = useState(null);
     const [formLoading, setFormLoading] = useState(false);
     const [formError, setFormError] = useState('');
@@ -40,6 +41,15 @@ function AdminDashboardContent() {
     const [eduDescription, setEduDescription] = useState('');
     const [eduOrder, setEduOrder] = useState(0);
 
+    // Certifications/Awards Form Fields State
+    const [certTitle, setCertTitle] = useState('');
+    const [certIssuer, setCertIssuer] = useState('');
+    const [certYear, setCertYear] = useState('');
+    const [certLink, setCertLink] = useState('');
+    const [certType, setCertType] = useState('certification');
+    const [certDescription, setCertDescription] = useState('');
+    const [certOrder, setCertOrder] = useState(0);
+
     const fileInputRef = useRef(null);
 
     // Verify auth status & Load initial data
@@ -52,8 +62,12 @@ function AdminDashboardContent() {
                     router.push('/admin/login');
                 } else {
                     setAuthenticated(true);
-                    // Fetch both lists
-                    await Promise.all([fetchProjects(), fetchEducation()]);
+                    // Fetch all lists
+                    await Promise.all([
+                        fetchProjects(), 
+                        fetchEducation(),
+                        fetchCertifications()
+                    ]);
                 }
             } catch (err) {
                 router.push('/admin/login');
@@ -65,8 +79,8 @@ function AdminDashboardContent() {
     // Handle initial tab / query params for edit
     useEffect(() => {
         const tabParam = searchParams.get('tab');
-        if (tabParam === 'education') {
-            setActiveTab('education');
+        if (tabParam === 'education' || tabParam === 'certifications') {
+            setActiveTab(tabParam);
         } else {
             setActiveTab('projects');
         }
@@ -82,9 +96,12 @@ function AdminDashboardContent() {
             } else if (activeTab === 'education' && educationItems.length > 0) {
                 const edu = educationItems.find(e => e._id === editId);
                 if (edu) openEducationEditModal(edu);
+            } else if (activeTab === 'certifications' && certificationItems.length > 0) {
+                const cert = certificationItems.find(c => c._id === editId);
+                if (cert) openCertificationEditModal(cert);
             }
         }
-    }, [searchParams, projects, educationItems, activeTab]);
+    }, [searchParams, projects, educationItems, certificationItems, activeTab]);
 
     // Fetch lists
     const fetchProjects = async () => {
@@ -106,6 +123,16 @@ function AdminDashboardContent() {
             if (data.success) setEducationItems(data.data);
         } catch (err) {
             console.error("Error fetching education:", err);
+        }
+    };
+
+    const fetchCertifications = async () => {
+        try {
+            const res = await fetch('/api/certifications');
+            const data = await res.json();
+            if (data.success) setCertificationItems(data.data);
+        } catch (err) {
+            console.error("Error fetching certifications:", err);
         }
     };
 
@@ -147,6 +174,21 @@ function AdminDashboardContent() {
                 setEducationItems(educationItems.filter(e => e._id !== id));
             } else {
                 alert(data.message || "Failed to delete entry");
+            }
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const handleDeleteCertification = async (id) => {
+        if (!confirm("Are you sure you want to delete this certification/award?")) return;
+        try {
+            const res = await fetch(`/api/certifications/${id}`, { method: 'DELETE' });
+            const data = await res.json();
+            if (data.success) {
+                setCertificationItems(certificationItems.filter(c => c._id !== id));
+            } else {
+                alert(data.message || "Failed to delete credential");
             }
         } catch (err) {
             console.error(err);
@@ -276,6 +318,34 @@ function AdminDashboardContent() {
         setModalOpen(true);
     };
 
+    const openCertificationAddModal = () => {
+        setModalType('certification');
+        setEditingId(null);
+        setCertTitle('');
+        setCertIssuer('');
+        setCertYear('');
+        setCertLink('');
+        setCertType('certification');
+        setCertDescription('');
+        setCertOrder(certificationItems.length + 1);
+        setFormError('');
+        setModalOpen(true);
+    };
+
+    const openCertificationEditModal = (cert) => {
+        setModalType('certification');
+        setEditingId(cert._id);
+        setCertTitle(cert.title);
+        setCertIssuer(cert.issuer);
+        setCertYear(cert.year);
+        setCertLink(cert.link || '');
+        setCertType(cert.type);
+        setCertDescription(cert.description || '');
+        setCertOrder(cert.order || 0);
+        setFormError('');
+        setModalOpen(true);
+    };
+
     const closeModal = () => {
         setModalOpen(false);
         // Clear edit url queries if any
@@ -315,8 +385,7 @@ function AdminDashboardContent() {
                 } else {
                     setFormError(data.message || "Failed to save project.");
                 }
-            } else {
-                // Education Type
+            } else if (modalType === 'education') {
                 const payload = { year: eduYear, company: eduCompany, role: eduRole, description: eduDescription, order: Number(eduOrder) };
                 const url = editingId ? `/api/education/${editingId}` : '/api/education';
                 const method = editingId ? 'PUT' : 'POST';
@@ -333,6 +402,33 @@ function AdminDashboardContent() {
                     fetchEducation();
                 } else {
                     setFormError(data.message || "Failed to save entry.");
+                }
+            } else {
+                // Certification Type
+                const payload = { 
+                    title: certTitle, 
+                    issuer: certIssuer, 
+                    year: certYear, 
+                    link: certLink, 
+                    type: certType, 
+                    description: certDescription, 
+                    order: Number(certOrder) 
+                };
+                const url = editingId ? `/api/certifications/${editingId}` : '/api/certifications';
+                const method = editingId ? 'PUT' : 'POST';
+
+                const res = await fetch(url, {
+                    method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload),
+                });
+
+                const data = await res.json();
+                if (data.success) {
+                    closeModal();
+                    fetchCertifications();
+                } else {
+                    setFormError(data.message || "Failed to save credential.");
                 }
             }
         } catch (err) {
@@ -370,10 +466,14 @@ function AdminDashboardContent() {
                     </div>
                     <div className="flex items-center gap-3">
                         <button
-                            onClick={activeTab === 'projects' ? openProjectAddModal : openEducationAddModal}
+                            onClick={() => {
+                                if (activeTab === 'projects') openProjectAddModal();
+                                else if (activeTab === 'education') openEducationAddModal();
+                                else openCertificationAddModal();
+                            }}
                             className="bg-[#C4F000] hover:bg-[#b8dd00] text-black px-5 py-2.5 rounded-full font-bold text-sm transition-all hover:scale-105 flex items-center gap-2"
                         >
-                            <FaPlus /> Add {activeTab === 'projects' ? 'Project' : 'Timeline Entry'}
+                            <FaPlus /> Add {activeTab === 'projects' ? 'Project' : activeTab === 'education' ? 'Timeline Entry' : 'Credential'}
                         </button>
                         <button
                             onClick={handleLogout}
@@ -385,7 +485,7 @@ function AdminDashboardContent() {
                 </div>
 
                 {/* Dashboard Tabs Selector */}
-                <div className="flex border-b border-zinc-800 mb-8 gap-6 text-sm">
+                <div className="flex border-b border-zinc-800 mb-8 gap-6 text-sm overflow-x-auto whitespace-nowrap">
                     <button
                         onClick={() => handleTabChange('projects')}
                         className={`pb-4 px-2 font-bold transition-all relative ${activeTab === 'projects' ? 'text-[#C4F000]' : 'text-gray-400 hover:text-white'}`}
@@ -404,21 +504,27 @@ function AdminDashboardContent() {
                             <motion.div layoutId="active_tab_indicator" className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#C4F000]" />
                         )}
                     </button>
+                    <button
+                        onClick={() => handleTabChange('certifications')}
+                        className={`pb-4 px-2 font-bold transition-all relative ${activeTab === 'certifications' ? 'text-[#C4F000]' : 'text-gray-400 hover:text-white'}`}
+                    >
+                        <span className="flex items-center gap-2"><FaAward /> Certifications & Awards ({certificationItems.length})</span>
+                        {activeTab === 'certifications' && (
+                            <motion.div layoutId="active_tab_indicator" className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#C4F000]" />
+                        )}
+                    </button>
                 </div>
 
                 {/* Content based on Active Tab */}
                 <div className="bg-zinc-950 border border-zinc-800 rounded-3xl p-6 sm:p-8 shadow-xl">
                     
-                    {activeTab === 'projects' ? (
+                    {activeTab === 'projects' && (
                         /* PROJECTS TAB */
                         <div>
                             <h2 className="text-xl font-bold text-white mb-6">Manage Projects</h2>
                             {projects.length === 0 ? (
                                 <div className="text-center py-20 border border-dashed border-zinc-800 rounded-2xl text-gray-500">
                                     <p className="text-lg">No projects added yet.</p>
-                                    <button onClick={openProjectAddModal} className="text-[#C4F000] hover:underline mt-2 inline-flex items-center gap-1 font-semibold">
-                                        Create your first project <FaPlus />
-                                    </button>
                                 </div>
                             ) : (
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -448,16 +554,15 @@ function AdminDashboardContent() {
                                 </div>
                             )}
                         </div>
-                    ) : (
+                    )}
+
+                    {activeTab === 'education' && (
                         /* EDUCATION & EXPERIENCE TAB */
                         <div>
                             <h2 className="text-xl font-bold text-white mb-6">Manage Timeline Entries</h2>
                             {educationItems.length === 0 ? (
                                 <div className="text-center py-20 border border-dashed border-zinc-800 rounded-2xl text-gray-500">
                                     <p className="text-lg">No education or experience entries added yet.</p>
-                                    <button onClick={openEducationAddModal} className="text-[#C4F000] hover:underline mt-2 inline-flex items-center gap-1 font-semibold">
-                                        Create your first entry <FaPlus />
-                                    </button>
                                 </div>
                             ) : (
                                 <div className="space-y-4">
@@ -482,6 +587,41 @@ function AdminDashboardContent() {
                             )}
                         </div>
                     )}
+
+                    {activeTab === 'certifications' && (
+                        /* CERTIFICATIONS & AWARDS TAB */
+                        <div>
+                            <h2 className="text-xl font-bold text-white mb-6">Manage Credentials & Awards</h2>
+                            {certificationItems.length === 0 ? (
+                                <div className="text-center py-20 border border-dashed border-zinc-800 rounded-2xl text-gray-500">
+                                    <p className="text-lg">No credentials or awards added yet.</p>
+                                </div>
+                            ) : (
+                                <div className="space-y-4">
+                                    {certificationItems.map((cert) => (
+                                        <div key={cert._id} className="bg-zinc-900/40 border border-zinc-850 hover:border-zinc-700 p-5 rounded-2xl flex flex-col md:flex-row justify-between md:items-center gap-4 transition-all duration-300">
+                                            <div className="space-y-1">
+                                                <div className="flex items-center gap-3">
+                                                    <span className="text-xs font-bold text-indigo-400 border border-indigo-400/40 px-2.5 py-0.5 rounded-full">{cert.type === 'award' ? 'Award' : 'Certification'}</span>
+                                                    <span className="text-xs text-gray-400 font-semibold">{cert.year}</span>
+                                                    <span className="text-[11px] bg-zinc-800 text-gray-500 px-2 py-0.5 rounded">Order: {cert.order}</span>
+                                                </div>
+                                                <h3 className="text-lg font-bold text-white mt-1">{cert.title}</h3>
+                                                <p className="text-sm font-semibold text-gray-300">{cert.issuer}</p>
+                                                {cert.link && <p className="text-xs text-blue-400 font-mono mt-1 break-all">{cert.link}</p>}
+                                                {cert.description && <p className="text-xs text-gray-500 max-w-3xl leading-relaxed mt-2">{cert.description}</p>}
+                                            </div>
+                                            <div className="flex gap-2 shrink-0 md:self-center">
+                                                <button onClick={() => openCertificationEditModal(cert)} className="p-2.5 bg-zinc-800 hover:bg-zinc-700 text-white rounded-xl text-xs transition-colors flex items-center gap-1.5"><FaEdit /> Edit</button>
+                                                <button onClick={() => handleDeleteCertification(cert._id)} className="p-2.5 bg-red-950/20 border border-red-500/30 hover:bg-red-900/30 text-red-400 rounded-xl text-xs transition-colors flex items-center gap-1.5"><FaTrash /> Delete</button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    )}
+
                 </div>
             </div>
 
@@ -495,7 +635,7 @@ function AdminDashboardContent() {
                             <button onClick={closeModal} className="absolute top-5 right-5 p-2 text-gray-500 hover:text-white rounded-full bg-zinc-900 transition-colors border border-zinc-800"><FaTimes /></button>
 
                             <h3 className="text-xl sm:text-2xl font-bold text-white mb-6">
-                                {editingId ? "Edit" : "Add"} {modalType === 'project' ? "Project" : "Timeline Entry"}
+                                {editingId ? "Edit" : "Add"} {modalType === 'project' ? "Project" : modalType === 'education' ? "Timeline Entry" : "Credential / Award"}
                             </h3>
 
                             {formError && (
@@ -503,7 +643,7 @@ function AdminDashboardContent() {
                             )}
 
                             <form onSubmit={handleSubmit} className="space-y-5">
-                                {modalType === 'project' ? (
+                                {modalType === 'project' && (
                                     /* PROJECT FORM CONTENT */
                                     <>
                                         <div className="space-y-1.5">
@@ -557,7 +697,9 @@ function AdminDashboardContent() {
                                             )}
                                         </div>
                                     </>
-                                ) : (
+                                )}
+
+                                {modalType === 'education' && (
                                     /* EDUCATION/EXPERIENCE FORM CONTENT */
                                     <>
                                         <div className="space-y-1.5">
@@ -579,6 +721,47 @@ function AdminDashboardContent() {
                                         <div className="space-y-1.5">
                                             <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Description</label>
                                             <textarea rows={4} value={eduDescription} onChange={(e) => setEduDescription(e.target.value)} placeholder="Explain what you did or studied during this period..." required className="w-full bg-zinc-900 border border-zinc-800 hover:border-zinc-700 text-white px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#C4F000]/50 resize-none transition-all" />
+                                        </div>
+                                    </>
+                                )}
+
+                                {modalType === 'certification' && (
+                                    /* CERTIFICATIONS/AWARDS FORM CONTENT */
+                                    <>
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div className="space-y-1.5">
+                                                <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Credential Type</label>
+                                                <select value={certType} onChange={(e) => setCertType(e.target.value)} required className="w-full bg-zinc-900 border border-zinc-800 hover:border-zinc-700 text-white px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#C4F000]/50 transition-all">
+                                                    <option value="certification">Certification</option>
+                                                    <option value="award">Award / Honor</option>
+                                                </select>
+                                            </div>
+                                            <div className="space-y-1.5">
+                                                <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Year Completed</label>
+                                                <input type="text" value={certYear} onChange={(e) => setCertYear(e.target.value)} placeholder="e.g. 2024" required className="w-full bg-zinc-900 border border-zinc-800 hover:border-zinc-700 text-white px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#C4F000]/50 transition-all" />
+                                            </div>
+                                        </div>
+                                        <div className="space-y-1.5">
+                                            <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Title / Name of Credential</label>
+                                            <input type="text" value={certTitle} onChange={(e) => setCertTitle(e.target.value)} placeholder="e.g. Meta Front-End Developer Certificate" required className="w-full bg-zinc-900 border border-zinc-800 hover:border-zinc-700 text-white px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#C4F000]/50 transition-all" />
+                                        </div>
+                                        <div className="space-y-1.5">
+                                            <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Issuer / Awarding Body</label>
+                                            <input type="text" value={certIssuer} onChange={(e) => setCertIssuer(e.target.value)} placeholder="e.g. Coursera / Meta" required className="w-full bg-zinc-900 border border-zinc-800 hover:border-zinc-700 text-white px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#C4F000]/50 transition-all" />
+                                        </div>
+                                        <div className="grid grid-cols-4 gap-4">
+                                            <div className="col-span-3 space-y-1.5">
+                                                <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Credential Verification URL (Optional)</label>
+                                                <input type="url" value={certLink} onChange={(e) => setCertLink(e.target.value)} placeholder="https://coursera.org/verify/..." className="w-full bg-zinc-900 border border-zinc-800 hover:border-zinc-700 text-white px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#C4F000]/50 transition-all" />
+                                            </div>
+                                            <div className="col-span-1 space-y-1.5">
+                                                <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Display Order</label>
+                                                <input type="number" value={certOrder} onChange={(e) => setCertOrder(e.target.value)} required className="w-full bg-zinc-900 border border-zinc-800 hover:border-zinc-700 text-white px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#C4F000]/50 transition-all" />
+                                            </div>
+                                        </div>
+                                        <div className="space-y-1.5">
+                                            <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Short Description (Optional)</label>
+                                            <textarea rows={3} value={certDescription} onChange={(e) => setCertDescription(e.target.value)} placeholder="Summarize what was achieved..." className="w-full bg-zinc-900 border border-zinc-800 hover:border-zinc-700 text-white px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#C4F000]/50 resize-none transition-all" />
                                         </div>
                                     </>
                                 )}
