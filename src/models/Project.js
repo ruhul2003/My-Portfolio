@@ -26,12 +26,12 @@ const ProjectSchema = new mongoose.Schema({
   },
   images: {
     type: [ProjectImageSchema],
-    required: [true, 'Please provide 3-5 images.'],
+    required: [true, 'Please provide at least 1 image.'],
     validate: {
       validator: function (v) {
-        return v && v.length >= 3 && v.length <= 5;
+        return v && v.length >= 1;
       },
-      message: 'A project must have between 3 and 5 images.',
+      message: 'A project must have at least 1 image.',
     },
   },
   technologies: {

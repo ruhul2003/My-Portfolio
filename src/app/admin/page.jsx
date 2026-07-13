@@ -231,11 +231,6 @@ function AdminDashboardContent() {
 
     const handleImageUpload = async (e) => {
         const files = Array.from(e.target.files);
-        if (images.length + files.length > 5) {
-            setFormError("You can upload a maximum of 5 images.");
-            return;
-        }
-
         setFormError('');
         const compressedList = [];
         for (let file of files) {
@@ -367,8 +362,8 @@ function AdminDashboardContent() {
 
         try {
             if (modalType === 'project') {
-                if (images.length < 3 || images.length > 5) {
-                    setFormError(`Please provide 3-5 images for the project (current: ${images.length}).`);
+                if (images.length < 1) {
+                    setFormError(`Please provide at least 1 image for the project.`);
                     setFormLoading(false);
                     return;
                 }
@@ -680,16 +675,14 @@ function AdminDashboardContent() {
                                         </div>
                                         <div className="space-y-2.5">
                                             <div className="flex justify-between items-center">
-                                                <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Project Images (Need 3 to 5 images)</label>
-                                                <span className="text-[11px] font-bold text-gray-500">{images.length} / 5 Images</span>
+                                                <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Project Images (Need at least 1 image)</label>
+                                                <span className="text-[11px] font-bold text-gray-500">{images.length} Image{images.length !== 1 ? 's' : ''}</span>
                                             </div>
-                                            {images.length < 5 && (
-                                                <div onClick={() => fileInputRef.current?.click()} className="border-2 border-dashed border-zinc-800 hover:border-[#C4F000]/60 bg-zinc-900/30 rounded-2xl py-6 flex flex-col items-center justify-center gap-2 cursor-pointer transition-colors">
-                                                    <FaImage className="text-2xl text-gray-500" />
-                                                    <span className="text-xs text-gray-400 font-medium">Click to upload and compress</span>
-                                                    <input type="file" ref={fileInputRef} onChange={handleImageUpload} multiple accept="image/*" className="hidden" />
-                                                </div>
-                                            )}
+                                            <div onClick={() => fileInputRef.current?.click()} className="border-2 border-dashed border-zinc-800 hover:border-[#C4F000]/60 bg-zinc-900/30 rounded-2xl py-6 flex flex-col items-center justify-center gap-2 cursor-pointer transition-colors">
+                                                <FaImage className="text-2xl text-gray-500" />
+                                                <span className="text-xs text-gray-400 font-medium">Click to upload and compress</span>
+                                                <input type="file" ref={fileInputRef} onChange={handleImageUpload} multiple accept="image/*" className="hidden" />
+                                            </div>
                                             {images.length > 0 && (
                                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2">
                                                     {images.map((img, idx) => (

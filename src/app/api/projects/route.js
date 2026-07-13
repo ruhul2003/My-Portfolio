@@ -51,8 +51,8 @@ export async function POST(request) {
     const body = await request.json();
     
     // Server-side validation of image count
-    if (!body.images || body.images.length < 3 || body.images.length > 5) {
-      return NextResponse.json({ success: false, message: 'You must provide between 3 and 5 images.' }, { status: 400 });
+    if (!body.images || body.images.length < 1) {
+      return NextResponse.json({ success: false, message: 'You must provide at least 1 image.' }, { status: 400 });
     }
 
     const project = await Project.create(body);
