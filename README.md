@@ -14,13 +14,6 @@ A premium, full-stack personal portfolio and Content Management System (CMS) bui
 *   **Certifications & Awards Grid:** A section detailing credentials, complete with direct external verification link indicators.
 *   **Responsive Forms:** Contact submission inputs with instant status indicators.
 
-### 🛡️ Admin CMS (Content Management System)
-*   **Secure Admin Login:** JWT token-based authentication using HTTP-only cookies.
-*   **Tabbed CMS Dashboard:** A centralized dashboard to add, edit, and delete elements across three tabs:
-    *   **Projects Tab:** Creates and updates projects. Includes an integrated HTML5 canvas client-side image compressor (optimizes 3-5 screenshots to lightweight base64 JPEG strings) and screenshot caption fields.
-    *   **Education & Experience Tab:** Full CRUD control over career timeline entries.
-    *   **Certifications & Awards Tab:** Full CRUD control over credentials.
-*   **Smart Data Seeding:** Integrates a self-healing seeding engine using database settings. It seeds default items on initial setup but respects all deletions, allowing the administrator to keep lists empty.
 
 ---
 

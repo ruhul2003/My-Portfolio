@@ -27,6 +27,7 @@ async function dbConnect() {
   if (!cached.promise) {
     const opts = {
       bufferCommands: false,
+      dbName: 'Portfolio',
     };
 
     cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {

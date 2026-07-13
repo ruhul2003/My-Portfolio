@@ -42,6 +42,6 @@ const ProjectSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
-});
+}, { collection: 'projects' });
 
 export default mongoose.models.Project || mongoose.model('Project', ProjectSchema);

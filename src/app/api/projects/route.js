@@ -17,89 +17,23 @@ function isAdmin(request) {
   }
 }
 
-const defaultProjects = [
-  {
-    title: "Tilux",
-    description: "Tilux is a modern marble and tiles showcase web application built with Next.js",
-    link: "https://tilux.vercel.app",
-    images: [
-      { url: "/assets/p5.png", title: "Landing Page" },
-      { url: "/assets/p5.png", title: "Product Categories" },
-      { url: "/assets/p5.png", title: "Interactive Product Showcase" }
-    ],
-    technologies: ["Next.js", "React", "Tailwind CSS", "MongoDB"],
-  },
-  {
-    title: "Keen Keeper",
-    description: "A brief description of this amazing project and what I delivered.",
-    link: "https://keen-keeper-tau-rosy.vercel.app",
-    images: [
-      { url: "/assets/p1.png", title: "Task Dashboard" },
-      { url: "/assets/p1.png", title: "Sprint View" },
-      { url: "/assets/p1.png", title: "Collaborators Panel" }
-    ],
-    technologies: ["React", "Vite", "Tailwind CSS"],
-  },
-  {
-    title: "DigiTools",
-    description: "Another standout project showcasing modern design and functionality.",
-    link: "https://digi-tools-platform-git-ruhul-ruhul-amin1.vercel.app",
-    images: [
-      { url: "/assets/p2.png", title: "Product Catalog" },
-      { url: "/assets/p2.png", title: "Shopping Cart" },
-      { url: "/assets/p2.png", title: "Stripe Checkout" }
-    ],
-    technologies: ["React", "Tailwind CSS", "Node.js"],
-  },
-  {
-    title: "English Janala",
-    description: "High-quality solution delivered to a client with great results.",
-    link: "https://english-janala.vercel.app",
-    images: [
-      { url: "/assets/p3.png", title: "Online Portal Homepage" },
-      { url: "/assets/p3.png", title: "Course Content Grid" },
-      { url: "/assets/p3.png", title: "Student Progress Tracker" }
-    ],
-    technologies: ["React", "Tailwind CSS", "Express"],
-  },
-  {
-    title: "Github Issue Tracker",
-    description: "Community-focused project that I'm really proud of.",
-    link: "https://github-issues-tracker-plum.vercel.app",
-    images: [
-      { url: "/assets/p4.png", title: "Active Issues Dashboard" },
-      { url: "/assets/p4.png", title: "Issue Filter Grid" },
-      { url: "/assets/p4.png", title: "New Issue Submission Form" }
-    ],
-    technologies: ["React", "Tailwind CSS", "Vite"],
-  },
-];
-
 import SystemSetting from '@/models/SystemSetting';
 
 // GET all projects
 export async function GET() {
   try {
     await dbConnect();
-    let projects = await Project.find({}).sort({ createdAt: -1 });
     
-    // Self-healing check: Convert old string array format to object format
-    if (projects.length > 0 && projects[0].images && projects[0].images[0] && typeof projects[0].images[0] === 'string') {
-      await Project.deleteMany({});
+    // Clean up previously seeded projects if hasSeeded flag is present
+    const hasSeeded = await SystemSetting.findOne({ key: 'seeded_projects' });
+    if (hasSeeded) {
+      await Project.deleteMany({
+        title: { $in: ["Tilux", "Keen Keeper", "DigiTools", "English Janala", "Github Issue Tracker"] }
+      });
       await SystemSetting.deleteOne({ key: 'seeded_projects' });
-      projects = [];
     }
 
-    // Seed default projects if never seeded before
-    const hasSeeded = await SystemSetting.findOne({ key: 'seeded_projects' });
-    if (projects.length === 0 && !hasSeeded) {
-      await Project.insertMany(defaultProjects);
-      await SystemSetting.create({ key: 'seeded_projects', value: 'true' });
-      projects = await Project.find({}).sort({ createdAt: -1 });
-    } else if (projects.length > 0 && !hasSeeded) {
-      await SystemSetting.create({ key: 'seeded_projects', value: 'true' });
-    }
-    
+    const projects = await Project.find({}).sort({ createdAt: -1 });
     return NextResponse.json({ success: true, data: projects }, { status: 200 });
   } catch (error) {
     return NextResponse.json({ success: false, message: error.message }, { status: 500 });
