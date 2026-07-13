@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { FaEnvelope, FaLock, FaSignInAlt, FaInfoCircle } from 'react-icons/fa';
+import { FaEnvelope, FaLock, FaSignInAlt } from 'react-icons/fa';
 
 export default function AdminLogin() {
     const [email, setEmail] = useState('');
@@ -139,15 +139,7 @@ export default function AdminLogin() {
                     </button>
                 </form>
 
-                {/* Helper credentials box */}
-                <div className="mt-8 pt-6 border-t border-zinc-900 text-xs text-gray-500 flex items-start gap-2 relative z-10">
-                    <FaInfoCircle className="mt-0.5 text-lime-400 shrink-0" />
-                    <div>
-                        <p className="font-semibold text-gray-400">Default Admin Credentials:</p>
-                        <p className="mt-1">Email: <code className="text-lime-300 font-mono">ruhul941020@gmail.com</code></p>
-                        <p>Password: <code className="text-lime-300 font-mono">ruhuls12</code></p>
-                    </div>
-                </div>
+
             </motion.div>
         </div>
     );
