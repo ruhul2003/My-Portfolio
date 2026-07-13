@@ -20,13 +20,15 @@ export default function Home() {
           <Education />
         </AnimatedSection>
 
+        <AnimatedSection direction="up" delay={0.1}>
+          <Projects />
+        </AnimatedSection>
+
         <AnimatedSection direction="right" delay={0.2}>
           <Services />
         </AnimatedSection>
 
-        <AnimatedSection direction="up" delay={0.1}>
-          <Projects />
-        </AnimatedSection>
+
 
         <AnimatedSection direction="up" delay={0.2}>
           <Contact />

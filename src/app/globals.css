@@ -1,6 +1,11 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 @import "tailwindcss";
 
+@theme {
+  --color-zinc-850: #52525b; /* Custom soft light gray to replace stark white fallback */
+  --color-zinc-750: #71717a; /* Custom medium light gray */
+}
+
 html {
   scroll-behavior: smooth;
 }

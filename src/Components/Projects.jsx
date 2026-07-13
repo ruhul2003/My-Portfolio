@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { FaTrash, FaEdit, FaPlus, FaExternalLinkAlt, FaTimes, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 const Projects = () => {
     const [projects, setProjects] = useState([]);
@@ -111,7 +112,7 @@ const Projects = () => {
                         <p className="text-xl">No projects found. Log in as admin to add some!</p>
                     </div>
                 ) : (
-                    <motion.div 
+                    <motion.div
                         layout
                         className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-10"
                     >
@@ -128,16 +129,18 @@ const Projects = () => {
                                         setSelectedProject(project);
                                         setCurrentImgIndex(0);
                                     }}
-                                    className="group relative cursor-pointer overflow-hidden rounded-3xl bg-zinc-900 shadow-xl transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl border border-gray-800/40 hover:border-gray-700/60"
+                                    className="group relative cursor-pointer overflow-hidden rounded-3xl bg-zinc-900 shadow-xl transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl border border-transparent hover:border-gray-700/60"
                                 >
                                     {/* Image Container */}
                                     <div className="relative aspect-16/10 overflow-hidden bg-black/40">
-                                        <img
+                                        <Image
                                             src={project.images && project.images[0] ? (project.images[0].url || project.images[0]) : "/assets/p1.png"}
                                             alt={project.title}
+                                            width={500}
+                                            height={500}
                                             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                                         />
-                                        
+
                                         {/* Hover Overlay */}
                                         <div className="absolute inset-0 bg-linear-to-b from-transparent via-black/30 to-black/80 opacity-0 group-hover:opacity-100 transition-all duration-500 flex items-end p-6">
                                             <span className="text-[#C4F000] font-semibold text-sm tracking-wider uppercase">View Project Details →</span>
@@ -172,7 +175,7 @@ const Projects = () => {
                                         <p className="text-[#B4B4B4] text-[15px] leading-relaxed mb-6 line-clamp-2">
                                             {project.description}
                                         </p>
-                                        
+
                                         {/* Technologies tags */}
                                         {project.technologies && project.technologies.length > 0 && (
                                             <div className="flex flex-wrap gap-2 mb-6">
