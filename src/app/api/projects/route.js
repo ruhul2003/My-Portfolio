@@ -33,7 +33,7 @@ export async function GET() {
       await SystemSetting.deleteOne({ key: 'seeded_projects' });
     }
 
-    const projects = await Project.find({}).sort({ createdAt: -1 });
+    const projects = await Project.find({}).sort({ order: 1, createdAt: -1 });
     return NextResponse.json({ success: true, data: projects }, { status: 200 });
   } catch (error) {
     return NextResponse.json({ success: false, message: error.message }, { status: 500 });
@@ -53,6 +53,14 @@ export async function POST(request) {
     // Server-side validation of image count
     if (!body.images || body.images.length < 1) {
       return NextResponse.json({ success: false, message: 'You must provide at least 1 image.' }, { status: 400 });
+    }
+
+    // Set order automatically if not specified
+    if (body.order === undefined || body.order === null) {
+      const highestOrderProject = await Project.findOne({}).sort({ order: -1 });
+      body.order = highestOrderProject ? (highestOrderProject.order || 0) + 1 : 1;
+    } else {
+      body.order = Number(body.order);
     }
 
     const project = await Project.create(body);

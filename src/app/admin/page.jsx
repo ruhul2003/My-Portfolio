@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaTrash, FaEdit, FaPlus, FaSignOutAlt, FaImage, FaTimes, FaGlobe, FaBriefcase, FaAward, FaCertificate } from 'react-icons/fa';
+import { FaTrash, FaEdit, FaPlus, FaSignOutAlt, FaImage, FaTimes, FaGlobe, FaBriefcase, FaAward, FaCertificate, FaArrowUp, FaArrowDown, FaTag } from 'react-icons/fa';
 
 function AdminDashboardContent() {
     const router = useRouter();
@@ -33,6 +33,9 @@ function AdminDashboardContent() {
     const [technologies, setTechnologies] = useState([]);
     const [techInput, setTechInput] = useState('');
     const [images, setImages] = useState([]); // base64 strings
+    const [category, setCategory] = useState('E-Commerce');
+    const [customCategory, setCustomCategory] = useState('');
+    const [order, setOrder] = useState(1);
 
     // Education/Experience Form Fields State
     const [eduYear, setEduYear] = useState('');
@@ -269,6 +272,42 @@ function AdminDashboardContent() {
         setTechnologies(prev => prev.filter((_, idx) => idx !== index));
     };
 
+    // REORDER PROJECTS HANDLER
+    const handleMoveProject = async (index, direction) => {
+        if (direction === 'up' && index === 0) return;
+        if (direction === 'down' && index === projects.length - 1) return;
+
+        const targetIndex = direction === 'up' ? index - 1 : index + 1;
+        const newProjects = [...projects];
+
+        // Swap items
+        const temp = newProjects[index];
+        newProjects[index] = newProjects[targetIndex];
+        newProjects[targetIndex] = temp;
+
+        // Update local order numbers
+        const reordered = newProjects.map((p, idx) => ({
+            ...p,
+            order: idx + 1,
+        }));
+
+        setProjects(reordered);
+
+        try {
+            await fetch('/api/projects/reorder', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    items: reordered.map(p => ({ id: p._id, order: p.order }))
+                }),
+            });
+        } catch (err) {
+            console.error("Error updating project order:", err);
+        }
+    };
+
+    const PREDEFINED_CATEGORIES = ['E-Commerce', 'Learning', 'Career', 'SaaS', 'Portfolio', 'Other'];
+
     // MODAL OPENERS
     const openProjectAddModal = () => {
         setModalType('project');
@@ -278,6 +317,9 @@ function AdminDashboardContent() {
         setLink('');
         setTechnologies([]);
         setImages([]);
+        setCategory('E-Commerce');
+        setCustomCategory('');
+        setOrder(projects.length + 1);
         setFormError('');
         setModalOpen(true);
     };
@@ -290,6 +332,17 @@ function AdminDashboardContent() {
         setLink(project.link || '');
         setTechnologies(project.technologies || []);
         setImages(project.images || []);
+        
+        const projCategory = project.category || 'Other';
+        if (PREDEFINED_CATEGORIES.includes(projCategory)) {
+            setCategory(projCategory);
+            setCustomCategory('');
+        } else {
+            setCategory('Custom');
+            setCustomCategory(projCategory);
+        }
+
+        setOrder(project.order !== undefined ? project.order : 1);
         setFormError('');
         setModalOpen(true);
     };
@@ -368,7 +421,8 @@ function AdminDashboardContent() {
                     return;
                 }
 
-                const payload = { title, description, link, technologies, images };
+                const finalCategory = category === 'Custom' ? (customCategory.trim() || 'Other') : category;
+                const payload = { title, description, link, technologies, images, category: finalCategory, order: Number(order) };
                 const url = editingId ? `/api/projects/${editingId}` : '/api/projects';
                 const method = editingId ? 'PUT' : 'POST';
 
@@ -521,33 +575,76 @@ function AdminDashboardContent() {
                     {activeTab === 'projects' && (
                         /* PROJECTS TAB */
                         <div>
-                            <h2 className="text-xl font-bold text-white mb-6">Manage Projects</h2>
+                            <div className="flex flex-wrap justify-between items-center mb-6 gap-4">
+                                <div>
+                                    <h2 className="text-xl font-bold text-white">Manage Projects</h2>
+                                    <p className="text-xs text-gray-400 mt-1">Use the Move Up (▲) / Move Down (▼) buttons to rearrange project index order.</p>
+                                </div>
+                            </div>
                             {projects.length === 0 ? (
                                 <div className="text-center py-20 border border-dashed border-zinc-800 rounded-2xl text-gray-500">
                                     <p className="text-lg">No projects added yet.</p>
                                 </div>
                             ) : (
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    {projects.map((project) => (
+                                    {projects.map((project, idx) => (
                                         <div key={project._id} className="bg-zinc-900/40 border border-zinc-850 rounded-2xl p-5 flex flex-col justify-between hover:border-zinc-700 transition-all duration-300 shadow-md group">
                                             <div>
                                                 <div className="relative aspect-video rounded-xl overflow-hidden mb-4 bg-black/40 border border-zinc-800">
                                                     <img src={project.images[0]?.url || project.images[0] || "/assets/p1.png"} alt={project.title} className="w-full h-full object-cover" />
+                                                    
+                                                    {/* Top Badges */}
+                                                    <div className="absolute top-2 left-2 flex flex-wrap gap-1.5 z-10">
+                                                        <span className="bg-[#C4F000] text-black font-extrabold text-[11px] px-2.5 py-0.5 rounded-full shadow">
+                                                            Index #{idx + 1}
+                                                        </span>
+                                                        <span className="bg-black/80 backdrop-blur-sm border border-zinc-700 text-[#C4F000] font-semibold text-[11px] px-2.5 py-0.5 rounded-full shadow flex items-center gap-1">
+                                                            <FaTag className="text-[9px]" /> {project.category || 'Other'}
+                                                        </span>
+                                                    </div>
+
                                                     <div className="absolute top-2 right-2 bg-black/80 backdrop-blur-sm border border-zinc-800 text-[11px] font-semibold text-gray-300 px-2 py-0.5 rounded-full">
                                                         {project.images.length} Images
                                                     </div>
                                                 </div>
+
                                                 <h3 className="text-lg font-bold text-white group-hover:text-[#C4F000] transition-colors">{project.title}</h3>
                                                 <p className="text-gray-400 text-xs mt-1.5 line-clamp-2 leading-relaxed">{project.description}</p>
                                                 <div className="flex flex-wrap gap-1.5 mt-3">
-                                                    {project.technologies.map((t, idx) => (
-                                                        <span key={idx} className="text-[10px] bg-zinc-850 text-gray-400 px-2.5 py-0.5 rounded-full">{t}</span>
+                                                    {project.technologies.map((t, techIdx) => (
+                                                        <span key={techIdx} className="text-[10px] bg-zinc-850 text-gray-400 px-2.5 py-0.5 rounded-full">{t}</span>
                                                     ))}
                                                 </div>
                                             </div>
-                                            <div className="flex gap-2.5 mt-5 pt-4 border-t border-zinc-850/60">
-                                                <button onClick={() => openProjectEditModal(project)} className="flex-1 bg-zinc-800 hover:bg-zinc-700 text-white font-bold py-2 px-3 rounded-lg text-xs transition-colors flex items-center justify-center gap-1.5"><FaEdit /> Edit</button>
-                                                <button onClick={() => handleDeleteProject(project._id)} className="bg-red-950/20 border border-red-500/30 hover:bg-red-900/30 text-red-400 font-bold py-2 px-3 rounded-lg text-xs transition-colors flex items-center justify-center gap-1.5"><FaTrash /> Delete</button>
+
+                                            <div className="flex flex-wrap items-center justify-between gap-2.5 mt-5 pt-4 border-t border-zinc-850/60">
+                                                {/* Move Up / Move Down Buttons */}
+                                                <div className="flex items-center gap-1.5 bg-zinc-950 border border-zinc-800 rounded-lg p-1">
+                                                    <span className="text-[11px] font-bold text-gray-500 px-1.5">Order</span>
+                                                    <button
+                                                        type="button"
+                                                        disabled={idx === 0}
+                                                        onClick={() => handleMoveProject(idx, 'up')}
+                                                        className="p-1.5 bg-zinc-850 hover:bg-zinc-750 disabled:opacity-30 disabled:hover:bg-zinc-850 text-white rounded transition-all text-xs"
+                                                        title="Move Up"
+                                                    >
+                                                        <FaArrowUp />
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        disabled={idx === projects.length - 1}
+                                                        onClick={() => handleMoveProject(idx, 'down')}
+                                                        className="p-1.5 bg-zinc-850 hover:bg-zinc-750 disabled:opacity-30 disabled:hover:bg-zinc-850 text-white rounded transition-all text-xs"
+                                                        title="Move Down"
+                                                    >
+                                                        <FaArrowDown />
+                                                    </button>
+                                                </div>
+
+                                                <div className="flex items-center gap-2 flex-1 justify-end">
+                                                    <button onClick={() => openProjectEditModal(project)} className="bg-zinc-800 hover:bg-zinc-700 text-white font-bold py-2 px-3 rounded-lg text-xs transition-colors flex items-center justify-center gap-1.5"><FaEdit /> Edit</button>
+                                                    <button onClick={() => handleDeleteProject(project._id)} className="bg-red-950/20 border border-red-500/30 hover:bg-red-900/30 text-red-400 font-bold py-2 px-3 rounded-lg text-xs transition-colors flex items-center justify-center gap-1.5"><FaTrash /> Delete</button>
+                                                </div>
                                             </div>
                                         </div>
                                     ))}
@@ -646,6 +743,51 @@ function AdminDashboardContent() {
                                 {modalType === 'project' && (
                                     /* PROJECT FORM CONTENT */
                                     <>
+                                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                            <div className="sm:col-span-2 space-y-1.5">
+                                                <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Project Category</label>
+                                                <select
+                                                    value={category}
+                                                    onChange={(e) => setCategory(e.target.value)}
+                                                    required
+                                                    className="w-full bg-zinc-900 border border-zinc-800 hover:border-zinc-700 text-white px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#C4F000]/50 transition-all"
+                                                >
+                                                    <option value="E-Commerce">E-Commerce</option>
+                                                    <option value="Learning">Learning</option>
+                                                    <option value="Career">Career</option>
+                                                    <option value="SaaS">SaaS</option>
+                                                    <option value="Portfolio">Portfolio</option>
+                                                    <option value="Other">Other</option>
+                                                    <option value="Custom">+ Custom Category...</option>
+                                                </select>
+                                            </div>
+                                            <div className="sm:col-span-1 space-y-1.5">
+                                                <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Display Order</label>
+                                                <input
+                                                    type="number"
+                                                    value={order}
+                                                    onChange={(e) => setOrder(e.target.value)}
+                                                    required
+                                                    min="1"
+                                                    className="w-full bg-zinc-900 border border-zinc-800 hover:border-zinc-700 text-white px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#C4F000]/50 transition-all"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        {category === 'Custom' && (
+                                            <div className="space-y-1.5">
+                                                <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Custom Category Name</label>
+                                                <input
+                                                    type="text"
+                                                    value={customCategory}
+                                                    onChange={(e) => setCustomCategory(e.target.value)}
+                                                    placeholder="e.g. Healthcare, AI Tool"
+                                                    required
+                                                    className="w-full bg-zinc-900 border border-zinc-800 hover:border-zinc-700 text-white px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#C4F000]/50 transition-all"
+                                                />
+                                            </div>
+                                        )}
+
                                         <div className="space-y-1.5">
                                             <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Project Title</label>
                                             <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="e.g. Acme SaaS" required className="w-full bg-zinc-900 border border-zinc-800 hover:border-zinc-700 text-white px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#C4F000]/50 transition-all" />

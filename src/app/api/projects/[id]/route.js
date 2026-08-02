@@ -34,6 +34,10 @@ export async function PUT(request, { params }) {
       return NextResponse.json({ success: false, message: 'You must provide at least 1 image.' }, { status: 400 });
     }
 
+    if (body.order !== undefined && body.order !== null) {
+      body.order = Number(body.order);
+    }
+
     const project = await Project.findByIdAndUpdate(id, body, {
       new: true,
       runValidators: true,
