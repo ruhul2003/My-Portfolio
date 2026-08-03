@@ -6,6 +6,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { FaFacebook, FaLinkedin, FaGithub } from "react-icons/fa";
 import { RiInstagramFill } from "react-icons/ri";
 import { HiMenu, HiX } from "react-icons/hi";
+import ThemeToggle from '@/Components/ThemeToggle';
 
 const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -120,7 +121,9 @@ const Navbar = () => {
                 </ul>
 
                 {/* Desktop Social & Auth */}
-                <div className="hidden md:flex gap-5 text-xl items-center">
+                <div className="hidden md:flex gap-4 text-xl items-center">
+                    <ThemeToggle />
+
                     <a
                         href="https://www.facebook.com/imtiaz.hossain.908347"
                         target="_blank"
@@ -156,26 +159,29 @@ const Navbar = () => {
                     {isAdmin ? (
                         <button
                             onClick={handleLogout}
-                            className="ml-4 text-xs font-semibold text-red-400 hover:text-red-300 border border-red-400/30 px-3 py-1 rounded bg-red-950/20 hover:bg-red-950/40 transition-all duration-200"
+                            className="ml-2 text-xs font-semibold text-red-400 hover:text-red-300 border border-red-400/30 px-3 py-1 rounded bg-red-950/20 hover:bg-red-950/40 transition-all duration-200"
                         >
                             Logout
                         </button>
                     ) : (
                         <Link
                             href="/admin/login"
-                            className="ml-4 text-xs font-semibold text-gray-400 hover:text-white border border-gray-600 px-3 py-1 rounded hover:bg-gray-800 transition-all duration-200"
+                            className="ml-2 text-xs font-semibold text-gray-400 hover:text-white border border-gray-600 px-3 py-1 rounded hover:bg-gray-800 transition-all duration-200"
                         >
                             Login
                         </Link>
                     )}
                 </div>
 
-                {/* Mobile Button */}
-                <div
-                    className="md:hidden text-3xl cursor-pointer"
-                    onClick={() => setIsOpen(!isOpen)}
-                >
-                    {isOpen ? <HiX /> : <HiMenu />}
+                {/* Mobile Button & Theme Toggle */}
+                <div className="flex md:hidden items-center gap-3">
+                    <ThemeToggle />
+                    <div
+                        className="text-3xl cursor-pointer"
+                        onClick={() => setIsOpen(!isOpen)}
+                    >
+                        {isOpen ? <HiX /> : <HiMenu />}
+                    </div>
                 </div>
             </nav>
 

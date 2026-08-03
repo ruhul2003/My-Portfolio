@@ -60,21 +60,21 @@ const Contact = () => {
     };
 
     return (
-        <section className="min-h-screen w-full bg-[#0a0a0a] py-20 relative overflow-hidden">
+        <section className="min-h-screen w-full bg-slate-50 dark:bg-[#0a0a0a] py-20 relative overflow-hidden transition-colors duration-300">
             {/* Ambient Background glows */}
-            <div className="absolute top-1/4 left-1/4 w-[450px] h-[450px] bg-[#C4F000]/3 rounded-full blur-[120px] pointer-events-none -translate-x-1/2 -translate-y-1/2"></div>
-            <div className="absolute bottom-1/4 right-1/4 w-[350px] h-[350px] bg-indigo-500/3 rounded-full blur-[100px] pointer-events-none translate-x-1/2 translate-y-1/2"></div>
+            <div className="absolute top-1/4 left-1/4 w-[450px] h-[450px] bg-[#65a30d]/5 dark:bg-[#C4F000]/3 rounded-full blur-[120px] pointer-events-none -translate-x-1/2 -translate-y-1/2"></div>
+            <div className="absolute bottom-1/4 right-1/4 w-[350px] h-[350px] bg-indigo-500/5 dark:bg-indigo-500/3 rounded-full blur-[100px] pointer-events-none translate-x-1/2 translate-y-1/2"></div>
 
             <div className="w-10/12 sm:w-9/12 max-w-7xl mx-auto relative z-10">
                 {/* Intro / Header */}
                 <div className="mb-16 md:mb-20">
-                    <span className="text-[#C4F000] text-xs sm:text-sm font-bold tracking-[0.25em] uppercase block mb-3">
+                    <span className="text-[#65a30d] dark:text-[#C4F000] text-xs sm:text-sm font-bold tracking-[0.25em] uppercase block mb-3">
                         GET IN TOUCH
                     </span>
-                    <h1 className="text-4xl md:text-6xl lg:text-[75px] font-extrabold text-[#B3B3B3] tracking-tight leading-none">
+                    <h1 className="text-4xl md:text-6xl lg:text-[75px] font-extrabold text-slate-900 dark:text-[#B3B3B3] tracking-tight leading-none">
                         Say Hello !
                     </h1>
-                    <p className="text-gray-400 mt-6 text-base sm:text-lg max-w-2xl font-light leading-relaxed">
+                    <p className="text-slate-700 dark:text-gray-400 mt-6 text-base sm:text-lg max-w-2xl font-light leading-relaxed">
                         Have a project in mind, an opportunity to discuss, or just want to say hi? Fill out the form or reach out directly—I'd love to connect with you.
                     </p>
                 </div>
@@ -93,24 +93,24 @@ const Contact = () => {
                         {/* Info cards */}
                         <motion.div 
                             variants={itemVariants}
-                            whileHover={{ y: -4, borderColor: "rgba(196, 240, 0, 0.25)" }}
-                            className="bg-zinc-900/20 backdrop-blur-sm border border-zinc-800/40 p-6 rounded-2xl flex items-start gap-5 transition-all duration-300 group animate-none"
+                            whileHover={{ y: -4, borderColor: "rgba(101, 163, 13, 0.25)" }}
+                            className="bg-white/90 dark:bg-zinc-900/20 backdrop-blur-sm border border-slate-200 dark:border-zinc-800/40 p-6 rounded-2xl flex items-start gap-5 transition-all duration-300 group shadow-sm"
                         >
-                            <div className="p-3.5 rounded-xl bg-zinc-900/60 border border-zinc-800/80 text-[#C4F000] text-xl group-hover:bg-[#C4F000] group-hover:text-black transition-all duration-300">
+                            <div className="p-3.5 rounded-xl bg-slate-100 dark:bg-zinc-900/60 border border-slate-200 dark:border-zinc-800/80 text-[#65a30d] dark:text-[#C4F000] text-xl group-hover:bg-[#65a30d] dark:group-hover:bg-[#C4F000] group-hover:text-white dark:group-hover:text-black transition-all duration-300">
                                 <FaEnvelope />
                             </div>
                             <div className="flex-1 min-w-0">
-                                <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Email Me Directly</h4>
+                                <h4 className="text-xs font-semibold text-slate-500 dark:text-gray-500 uppercase tracking-wider mb-1">Email Me Directly</h4>
                                 <a 
                                     href="mailto:ruhul941020@gmail.com" 
-                                    className="text-white hover:text-[#C4F000] transition-colors font-medium break-words block text-sm sm:text-base"
+                                    className="text-slate-900 dark:text-white hover:text-[#65a30d] dark:hover:text-[#C4F000] transition-colors font-medium break-words block text-sm sm:text-base"
                                 >
                                     ruhul941020@gmail.com
                                 </a>
                                 <button 
                                     type="button"
                                     onClick={handleCopyEmail}
-                                    className="text-xs text-gray-400 hover:text-[#C4F000] mt-2 flex items-center gap-1 transition-colors cursor-pointer"
+                                    className="text-xs text-slate-500 dark:text-gray-400 hover:text-[#65a30d] dark:hover:text-[#C4F000] mt-2 flex items-center gap-1 transition-colors cursor-pointer"
                                 >
                                     {copied ? 'Copied to clipboard!' : 'Copy to clipboard'}
                                 </button>
@@ -119,35 +119,35 @@ const Contact = () => {
 
                         <motion.div 
                             variants={itemVariants}
-                            whileHover={{ y: -4, borderColor: "rgba(196, 240, 0, 0.25)" }}
-                            className="bg-zinc-900/20 backdrop-blur-sm border border-zinc-800/40 p-6 rounded-2xl flex items-start gap-5 transition-all duration-300 group"
+                            whileHover={{ y: -4, borderColor: "rgba(101, 163, 13, 0.25)" }}
+                            className="bg-white/90 dark:bg-zinc-900/20 backdrop-blur-sm border border-slate-200 dark:border-zinc-800/40 p-6 rounded-2xl flex items-start gap-5 transition-all duration-300 group shadow-sm"
                         >
-                            <div className="p-3.5 rounded-xl bg-zinc-900/60 border border-zinc-800/80 text-[#C4F000] text-xl group-hover:bg-[#C4F000] group-hover:text-black transition-all duration-300">
+                            <div className="p-3.5 rounded-xl bg-slate-100 dark:bg-zinc-900/60 border border-slate-200 dark:border-zinc-800/80 text-[#65a30d] dark:text-[#C4F000] text-xl group-hover:bg-[#65a30d] dark:group-hover:bg-[#C4F000] group-hover:text-white dark:group-hover:text-black transition-all duration-300">
                                 <FaMapMarkerAlt />
                             </div>
                             <div>
-                                <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Location</h4>
-                                <p className="text-white font-medium text-sm sm:text-base">
+                                <h4 className="text-xs font-semibold text-slate-500 dark:text-gray-500 uppercase tracking-wider mb-1">Location</h4>
+                                <p className="text-slate-900 dark:text-white font-medium text-sm sm:text-base">
                                     Dhaka, Bangladesh
                                 </p>
-                                <span className="text-xs text-gray-400 block mt-1">Open to remote & hybrid roles globally</span>
+                                <span className="text-xs text-slate-500 dark:text-gray-400 block mt-1">Open to remote & hybrid roles globally</span>
                             </div>
                         </motion.div>
 
                         <motion.div 
                             variants={itemVariants}
-                            whileHover={{ y: -4, borderColor: "rgba(196, 240, 0, 0.25)" }}
-                            className="bg-zinc-900/20 backdrop-blur-sm border border-zinc-800/40 p-6 rounded-2xl flex items-start gap-5 transition-all duration-300 group"
+                            whileHover={{ y: -4, borderColor: "rgba(101, 163, 13, 0.25)" }}
+                            className="bg-white/90 dark:bg-zinc-900/20 backdrop-blur-sm border border-slate-200 dark:border-zinc-800/40 p-6 rounded-2xl flex items-start gap-5 transition-all duration-300 group shadow-sm"
                         >
-                            <div className="p-3.5 rounded-xl bg-zinc-900/60 border border-zinc-800/80 text-[#C4F000] text-xl group-hover:bg-[#C4F000] group-hover:text-black transition-all duration-300">
+                            <div className="p-3.5 rounded-xl bg-slate-100 dark:bg-zinc-900/60 border border-slate-200 dark:border-zinc-800/80 text-[#65a30d] dark:text-[#C4F000] text-xl group-hover:bg-[#65a30d] dark:group-hover:bg-[#C4F000] group-hover:text-white dark:group-hover:text-black transition-all duration-300">
                                 <FaCalendarCheck />
                             </div>
                             <div>
-                                <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Availability</h4>
-                                <p className="text-white font-medium text-sm sm:text-base">
+                                <h4 className="text-xs font-semibold text-slate-500 dark:text-gray-500 uppercase tracking-wider mb-1">Availability</h4>
+                                <p className="text-slate-900 dark:text-white font-medium text-sm sm:text-base">
                                     Freelance, Contract & Full-time
                                 </p>
-                                <span className="text-[#C4F000] text-xs font-semibold px-2 py-0.5 rounded-full bg-[#C4F000]/10 border border-[#C4F000]/20 mt-2 inline-block">
+                                <span className="text-[#65a30d] dark:text-[#C4F000] text-xs font-semibold px-2 py-0.5 rounded-full bg-[#65a30d]/10 dark:bg-[#C4F000]/10 border border-[#65a30d]/20 dark:border-[#C4F000]/20 mt-2 inline-block">
                                     Available Now
                                 </span>
                             </div>
@@ -155,7 +155,7 @@ const Contact = () => {
 
                         {/* Social profiles connect */}
                         <motion.div variants={itemVariants} className="pt-4 space-y-4">
-                            <span className="text-xs font-bold text-gray-500 uppercase tracking-[0.2em] block">
+                            <span className="text-xs font-bold text-slate-500 dark:text-gray-500 uppercase tracking-[0.2em] block">
                                 CONNECT WITH ME
                             </span>
                             <div className="flex gap-4">
@@ -163,21 +163,21 @@ const Contact = () => {
                                     href="https://github.com/ruhul2003" 
                                     target="_blank" 
                                     rel="noopener noreferrer" 
-                                    className="w-12 h-12 rounded-full bg-zinc-900/40 border border-zinc-800/60 hover:bg-[#C4F000] hover:text-black hover:border-[#C4F000] flex items-center justify-center transition-all duration-300 text-lg cursor-pointer"
+                                    className="w-12 h-12 rounded-full bg-white dark:bg-zinc-900/40 border border-slate-200 dark:border-zinc-800/60 text-slate-700 dark:text-white hover:bg-[#65a30d] dark:hover:bg-[#C4F000] hover:text-white dark:hover:text-black hover:border-[#65a30d] dark:hover:border-[#C4F000] flex items-center justify-center transition-all duration-300 text-lg cursor-pointer shadow-sm"
                                     title="GitHub"
                                 >
                                     <FaGithub />
                                 </a>
                                 <a 
                                     href="#" 
-                                    className="w-12 h-12 rounded-full bg-zinc-900/40 border border-zinc-800/60 hover:bg-[#C4F000] hover:text-black hover:border-[#C4F000] flex items-center justify-center transition-all duration-300 text-lg cursor-pointer"
+                                    className="w-12 h-12 rounded-full bg-white dark:bg-zinc-900/40 border border-slate-200 dark:border-zinc-800/60 text-slate-700 dark:text-white hover:bg-[#65a30d] dark:hover:bg-[#C4F000] hover:text-white dark:hover:text-black hover:border-[#65a30d] dark:hover:border-[#C4F000] flex items-center justify-center transition-all duration-300 text-lg cursor-pointer shadow-sm"
                                     title="LinkedIn"
                                 >
                                     <FaLinkedin />
                                 </a>
                                 <a 
                                     href="#" 
-                                    className="w-12 h-12 rounded-full bg-zinc-900/40 border border-zinc-800/60 hover:bg-[#C4F000] hover:text-black hover:border-[#C4F000] flex items-center justify-center transition-all duration-300 text-lg cursor-pointer"
+                                    className="w-12 h-12 rounded-full bg-white dark:bg-zinc-900/40 border border-slate-200 dark:border-zinc-800/60 text-slate-700 dark:text-white hover:bg-[#65a30d] dark:hover:bg-[#C4F000] hover:text-white dark:hover:text-black hover:border-[#65a30d] dark:hover:border-[#C4F000] flex items-center justify-center transition-all duration-300 text-lg cursor-pointer shadow-sm"
                                     title="Twitter"
                                 >
                                     <FaTwitter />
@@ -192,10 +192,10 @@ const Contact = () => {
                         whileInView={{ opacity: 1, x: 0 }}
                         viewport={{ once: true, margin: "-50px" }}
                         transition={{ type: "spring", stiffness: 60, damping: 15 }}
-                        className="lg:col-span-7 bg-zinc-900/10 backdrop-blur-sm border border-zinc-900/80 p-8 sm:p-10 rounded-3xl relative overflow-hidden shadow-2xl hover:border-zinc-800/40 transition-all duration-500"
+                        className="lg:col-span-7 bg-white dark:bg-zinc-900/10 backdrop-blur-sm border border-slate-200 dark:border-zinc-900/80 p-8 sm:p-10 rounded-3xl relative overflow-hidden shadow-xl dark:shadow-2xl hover:border-slate-300 dark:hover:border-zinc-800/40 transition-all duration-500"
                     >
                         {/* Soft ambient glow in card */}
-                        <div className="absolute -right-20 -bottom-20 w-60 h-60 bg-[#C4F000]/5 rounded-full blur-[80px] pointer-events-none"></div>
+                        <div className="absolute -right-20 -bottom-20 w-60 h-60 bg-[#65a30d]/5 dark:bg-[#C4F000]/5 rounded-full blur-[80px] pointer-events-none"></div>
 
                         <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-8 relative z-10">
                             
@@ -206,7 +206,7 @@ const Contact = () => {
                                         initial={{ opacity: 0, y: -10 }}
                                         animate={{ opacity: 1, y: 0 }}
                                         exit={{ opacity: 0, y: -10 }}
-                                        className="bg-lime-400/10 border border-lime-400/30 text-lime-400 p-5 rounded-2xl flex items-center gap-3 font-medium text-sm sm:text-base"
+                                        className="bg-lime-500/10 border border-lime-500/30 text-lime-600 dark:text-lime-400 p-5 rounded-2xl flex items-center gap-3 font-medium text-sm sm:text-base"
                                     >
                                         <FaCheckCircle className="text-xl shrink-0" />
                                         <span>Message sent successfully! I will respond within 24 hours. ✨</span>
@@ -218,64 +218,64 @@ const Contact = () => {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 {/* Name Input */}
                                 <div>
-                                    <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 block">Full Name</label>
+                                    <label className="text-xs font-semibold text-slate-500 dark:text-gray-500 uppercase tracking-wider mb-2 block">Full Name</label>
                                     <input
                                         type="text"
                                         value={name}
                                         onChange={(e) => setName(e.target.value)}
                                         placeholder="Steve Milner"
                                         required
-                                        className="w-full bg-zinc-950/60 border border-zinc-800/80 text-white placeholder-zinc-650 px-5 py-4 rounded-xl focus:outline-none focus:border-[#C4F000] focus:ring-1 focus:ring-[#C4F000] transition-all duration-300 text-sm sm:text-base"
+                                        className="w-full bg-slate-100 dark:bg-zinc-950/60 border border-slate-200 dark:border-zinc-800/80 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-zinc-650 px-5 py-4 rounded-xl focus:outline-none focus:border-[#65a30d] dark:focus:border-[#C4F000] focus:ring-1 focus:ring-[#65a30d] dark:focus:ring-[#C4F000] transition-all duration-300 text-sm sm:text-base"
                                     />
                                 </div>
 
                                 {/* Email Input */}
                                 <div>
-                                    <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 block">Email Address</label>
+                                    <label className="text-xs font-semibold text-slate-500 dark:text-gray-500 uppercase tracking-wider mb-2 block">Email Address</label>
                                     <input
                                         type="email"
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
                                         placeholder="steve@example.com"
                                         required
-                                        className="w-full bg-zinc-950/60 border border-zinc-800/80 text-white placeholder-zinc-650 px-5 py-4 rounded-xl focus:outline-none focus:border-[#C4F000] focus:ring-1 focus:ring-[#C4F000] transition-all duration-300 text-sm sm:text-base"
+                                        className="w-full bg-slate-100 dark:bg-zinc-950/60 border border-slate-200 dark:border-zinc-800/80 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-zinc-650 px-5 py-4 rounded-xl focus:outline-none focus:border-[#65a30d] dark:focus:border-[#C4F000] focus:ring-1 focus:ring-[#65a30d] dark:focus:ring-[#C4F000] transition-all duration-300 text-sm sm:text-base"
                                     />
                                 </div>
                             </div>
 
-                            {/* Message Field */}
+                            {/* Message Input */}
                             <div>
-                                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 block">Your Message</label>
+                                <label className="text-xs font-semibold text-slate-500 dark:text-gray-500 uppercase tracking-wider mb-2 block">Your Message</label>
                                 <textarea
-                                    rows={6}
+                                    rows="5"
                                     value={message}
                                     onChange={(e) => setMessage(e.target.value)}
-                                    placeholder="Tell me about your project, idea, or request..."
+                                    placeholder="Tell me about your project, timeline, or inquiry..."
                                     required
-                                    className="w-full bg-zinc-950/60 border border-zinc-800/80 text-white placeholder-zinc-650 px-5 py-4 rounded-2xl focus:outline-none focus:border-[#C4F000] focus:ring-1 focus:ring-[#C4F000] transition-all duration-300 min-h-[160px] resize-none text-sm sm:text-base"
-                                />
+                                    className="w-full bg-slate-100 dark:bg-zinc-950/60 border border-slate-200 dark:border-zinc-800/80 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-zinc-650 px-5 py-4 rounded-xl focus:outline-none focus:border-[#65a30d] dark:focus:border-[#C4F000] focus:ring-1 focus:ring-[#65a30d] dark:focus:ring-[#C4F000] transition-all duration-300 text-sm sm:text-base resize-none"
+                                ></textarea>
                             </div>
 
                             {/* Submit Button */}
-                            <div className="pt-2">
-                                <button
-                                    type="submit"
-                                    disabled={status === 'sending'}
-                                    className="w-full sm:w-auto bg-[#C4F000] hover:bg-[#b8dd00] active:scale-98 text-black font-bold text-sm sm:text-base px-8 py-4 rounded-full flex items-center justify-center gap-2.5 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-[#C4F000]/10 cursor-pointer"
-                                >
-                                    {status === 'sending' ? (
-                                        <>
-                                            <FaSpinner className="animate-spin text-lg" />
-                                            <span>Sending message...</span>
-                                        </>
-                                    ) : (
-                                        <>
-                                            <FaPaperPlane className="text-sm" />
-                                            <span>Send Message</span>
-                                        </>
-                                    )}
-                                </button>
-                            </div>
+                            <motion.button
+                                type="submit"
+                                disabled={status === 'sending'}
+                                whileHover={{ scale: 1.02 }}
+                                whileTap={{ scale: 0.98 }}
+                                className="w-full bg-[#65a30d] dark:bg-[#C4F000] hover:bg-[#52840a] dark:hover:bg-[#b8dd00] text-white dark:text-black font-bold py-4 px-8 rounded-xl transition-all duration-300 flex items-center justify-center gap-3 shadow-lg shadow-[#65a30d]/10 dark:shadow-[#C4F000]/10 disabled:opacity-50 cursor-pointer"
+                            >
+                                {status === 'sending' ? (
+                                    <>
+                                        <FaSpinner className="animate-spin text-lg" />
+                                        <span>Sending Message...</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        <FaPaperPlane className="text-sm" />
+                                        <span>Send Message</span>
+                                    </>
+                                )}
+                            </motion.button>
                         </form>
                     </motion.div>
                 </div>

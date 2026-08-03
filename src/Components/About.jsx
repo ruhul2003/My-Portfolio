@@ -52,12 +52,12 @@ const About = () => {
             <div className="absolute left-0 bottom-1/4 w-[300px] h-[300px] bg-indigo-500/5 rounded-full blur-[100px] pointer-events-none"></div>
 
             {/* Heading */}
-            <h1 className="text-4xl md:text-6xl lg:text-[80px] font-extrabold text-[#B3B3B3] text-center md:text-left tracking-tight">
+            <h1 className="text-4xl md:text-6xl lg:text-[80px] font-extrabold text-slate-900 dark:text-[#B3B3B3] text-center md:text-left tracking-tight">
                 About Me
             </h1>
 
             {/* Short Intro */}
-            <p className="text-[#B4B4B4] mt-8 text-[18px] md:text-[20px] max-w-3xl mx-auto md:mx-0 leading-relaxed font-light">
+            <p className="text-slate-700 dark:text-[#B4B4B4] mt-8 text-[18px] md:text-[20px] max-w-3xl mx-auto md:mx-0 leading-relaxed font-light">
                 With over 2 years of dedicated focus on developing web applications that achieve business goals, I have established myself as a trusted professional in the industry.
             </p>
 
@@ -79,16 +79,16 @@ const About = () => {
                         key={index}
                         variants={itemVariants}
                         whileHover={{ y: -6, borderColor: "rgba(196, 240, 0, 0.4)", backgroundColor: "rgba(255, 255, 255, 0.02)" }}
-                        className="flex flex-col items-center md:items-start text-center md:text-left p-6 rounded-2xl border border-zinc-800/40 bg-zinc-900/10 backdrop-blur-sm transition-colors duration-300"
+                        className="flex flex-col items-center md:items-start text-center md:text-left p-6 rounded-2xl border border-slate-300 dark:border-zinc-800/40 bg-white/80 dark:bg-zinc-900/10 backdrop-blur-sm transition-colors duration-300 shadow-sm"
                     >
-                        <h2 className="text-[#C4F000] font-extrabold text-5xl tracking-tight">{stat.number}</h2>
-                        <p className="text-[14px] md:text-[15px] text-[#B4B4B4] mt-2 font-medium">{stat.label}</p>
+                        <h2 className="text-[#65a30d] dark:text-[#C4F000] font-extrabold text-5xl tracking-tight">{stat.number}</h2>
+                        <p className="text-[14px] md:text-[15px] text-slate-700 dark:text-[#B4B4B4] mt-2 font-medium">{stat.label}</p>
                     </motion.div>
                 ))}
             </motion.div>
 
             {/* Bio Section - Refactored Grid without Photo */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-start mt-10 border-t border-zinc-900 pt-16">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-start mt-10 border-t border-slate-300 dark:border-zinc-900 pt-16">
                 
                 {/* Left Side: Callout Heading */}
                 <motion.div 
@@ -98,15 +98,15 @@ const About = () => {
                     transition={{ type: "spring", stiffness: 60, damping: 15 }}
                     className="lg:col-span-5 space-y-6"
                 >
-                    <h2 className="text-3xl sm:text-4xl md:text-[42px] leading-tight font-light text-white tracking-tight">
-                        A Passionate <span className="text-[#D4FF00] font-medium">Web Designer</span> Turning Ideas Into Visually Stunning, User-Friendly Websites.
+                    <h2 className="text-3xl sm:text-4xl md:text-[42px] leading-tight font-light text-slate-900 dark:text-white tracking-tight">
+                        A Passionate <span className="text-[#65a30d] dark:text-[#D4FF00] font-medium">Web Designer</span> Turning Ideas Into Visually Stunning, User-Friendly Websites.
                     </h2>
                     <motion.div 
                         initial={{ width: 0 }}
                         whileInView={{ width: 80 }}
                         viewport={{ once: true }}
                         transition={{ duration: 0.8, delay: 0.2 }}
-                        className="h-1 bg-[#D4FF00] rounded"
+                        className="h-1 bg-[#65a30d] dark:bg-[#D4FF00] rounded"
                     ></motion.div>
                 </motion.div>
 
@@ -116,7 +116,7 @@ const About = () => {
                     whileInView={{ opacity: 1, x: 0 }}
                     viewport={{ once: true }}
                     transition={{ type: "spring", stiffness: 60, damping: 15, delay: 0.1 }}
-                    className="lg:col-span-7 space-y-6 text-gray-400 font-light leading-relaxed text-[16px] text-left"
+                    className="lg:col-span-7 space-y-6 text-slate-700 dark:text-gray-400 font-light leading-relaxed text-[16px] text-left"
                 >
                     <p>
                         Hi, I’m Ruhul Amin — a passionate Web Developer and Web Designer with around two years of hands-on experience building modern, user-friendly digital experiences. I specialize in full-stack development, focusing on creating responsive interfaces and scalable web applications.
@@ -128,13 +128,13 @@ const About = () => {
             </div>
 
             {/* Core Principles Section - Added for spacing & professionalism */}
-            <div className="mt-24 border-t border-zinc-900 pt-16">
+            <div className="mt-24 border-t border-slate-300 dark:border-zinc-900 pt-16">
                 <motion.h3 
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ duration: 0.5 }}
-                    className="text-2xl font-bold text-white mb-8 tracking-tight"
+                    className="text-2xl font-bold text-slate-900 dark:text-white mb-8 tracking-tight"
                 >
                     My Focus & Core Principles
                 </motion.h3>
@@ -152,13 +152,13 @@ const About = () => {
                             variants={itemVariants}
                             whileHover={{ 
                                 y: -6, 
-                                borderColor: "rgba(196, 240, 0, 0.3)", 
-                                backgroundColor: "rgba(255, 255, 255, 0.01)" 
+                                borderColor: "rgba(101, 163, 13, 0.4)", 
+                                backgroundColor: "rgba(255, 255, 255, 0.9)" 
                             }}
-                            className="p-6 rounded-2xl border border-zinc-800/40 bg-zinc-900/5 backdrop-blur-sm transition-all duration-300"
+                            className="p-6 rounded-2xl border border-slate-300 dark:border-zinc-800/40 bg-white/80 dark:bg-zinc-900/5 backdrop-blur-sm transition-all duration-300 shadow-sm"
                         >
-                            <h4 className="text-[#C4F000] font-bold text-lg tracking-tight">{p.title}</h4>
-                            <p className="text-sm text-gray-400 mt-3 font-light leading-relaxed">{p.desc}</p>
+                            <h4 className="text-[#65a30d] dark:text-[#C4F000] font-bold text-lg tracking-tight">{p.title}</h4>
+                            <p className="text-sm text-slate-700 dark:text-gray-400 mt-3 font-light leading-relaxed">{p.desc}</p>
                         </motion.div>
                     ))}
                 </motion.div>
