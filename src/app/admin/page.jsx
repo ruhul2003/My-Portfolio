@@ -578,7 +578,7 @@ function AdminDashboardContent() {
                             <div className="flex flex-wrap justify-between items-center mb-6 gap-4">
                                 <div>
                                     <h2 className="text-xl font-bold text-white">Manage Projects</h2>
-                                    <p className="text-xs text-gray-400 mt-1">Use the Move Up (▲) / Move Down (▼) buttons to rearrange project index order.</p>
+                                    <p className="text-xs text-gray-400 mt-1">Use the Move Up (▲) / Move Down (▼) buttons to rearrange project order.</p>
                                 </div>
                             </div>
                             {projects.length === 0 ? (
@@ -593,11 +593,8 @@ function AdminDashboardContent() {
                                                 <div className="relative aspect-video rounded-xl overflow-hidden mb-4 bg-black/40 border border-zinc-800">
                                                     <img src={project.images[0]?.url || project.images[0] || "/assets/p1.png"} alt={project.title} className="w-full h-full object-cover" />
                                                     
-                                                    {/* Top Badges */}
-                                                    <div className="absolute top-2 left-2 flex flex-wrap gap-1.5 z-10">
-                                                        <span className="bg-[#C4F000] text-black font-extrabold text-[11px] px-2.5 py-0.5 rounded-full shadow">
-                                                            Index #{idx + 1}
-                                                        </span>
+                                                    {/* Category Badge */}
+                                                    <div className="absolute top-2 left-2 z-10">
                                                         <span className="bg-black/80 backdrop-blur-sm border border-zinc-700 text-[#C4F000] font-semibold text-[11px] px-2.5 py-0.5 rounded-full shadow flex items-center gap-1">
                                                             <FaTag className="text-[9px]" /> {project.category || 'Other'}
                                                         </span>
@@ -619,13 +616,12 @@ function AdminDashboardContent() {
 
                                             <div className="flex flex-wrap items-center justify-between gap-2.5 mt-5 pt-4 border-t border-zinc-850/60">
                                                 {/* Move Up / Move Down Buttons */}
-                                                <div className="flex items-center gap-1.5 bg-zinc-950 border border-zinc-800 rounded-lg p-1">
-                                                    <span className="text-[11px] font-bold text-gray-500 px-1.5">Order</span>
+                                                <div className="flex items-center gap-1 bg-zinc-950 border border-zinc-800 rounded-lg p-1">
                                                     <button
                                                         type="button"
                                                         disabled={idx === 0}
                                                         onClick={() => handleMoveProject(idx, 'up')}
-                                                        className="p-1.5 bg-zinc-850 hover:bg-zinc-750 disabled:opacity-30 disabled:hover:bg-zinc-850 text-white rounded transition-all text-xs"
+                                                        className="p-1.5 bg-zinc-850 hover:bg-zinc-750 disabled:opacity-30 disabled:hover:bg-zinc-850 text-white rounded transition-all text-xs flex items-center gap-1"
                                                         title="Move Up"
                                                     >
                                                         <FaArrowUp />
@@ -634,7 +630,7 @@ function AdminDashboardContent() {
                                                         type="button"
                                                         disabled={idx === projects.length - 1}
                                                         onClick={() => handleMoveProject(idx, 'down')}
-                                                        className="p-1.5 bg-zinc-850 hover:bg-zinc-750 disabled:opacity-30 disabled:hover:bg-zinc-850 text-white rounded transition-all text-xs"
+                                                        className="p-1.5 bg-zinc-850 hover:bg-zinc-750 disabled:opacity-30 disabled:hover:bg-zinc-850 text-white rounded transition-all text-xs flex items-center gap-1"
                                                         title="Move Down"
                                                     >
                                                         <FaArrowDown />
