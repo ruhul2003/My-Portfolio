@@ -104,7 +104,11 @@ const Banner = () => {
                         variants={textItemVariants}
                         className="pt-2 flex justify-center md:justify-start"
                     >
-                        <motion.button 
+                        <motion.a 
+                            href="/assets/Resume.pdf"
+                            download="Resume.pdf"
+                            target="_blank"
+                            rel="noopener noreferrer"
                             whileHover={{ scale: 1.05, backgroundColor: "#b8dd00" }}
                             whileTap={{ scale: 0.98 }}
                             className="bg-[#D4FF00] text-black font-semibold px-6 sm:px-8 py-3 sm:py-4 rounded-full flex items-center gap-2 transition-colors cursor-pointer shadow-lg shadow-[#D4FF00]/10"
@@ -117,7 +121,7 @@ const Banner = () => {
                                 <path d="m6 11 6 6 6-6" />
                                 <path d="M19 21H5" />
                             </svg>
-                        </motion.button>
+                        </motion.a>
                     </motion.div>
                 </motion.div>
 
