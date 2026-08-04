@@ -106,7 +106,6 @@ const Banner = () => {
                     >
                         <motion.a 
                             href="/assets/Resume.pdf"
-                            download="Resume.pdf"
                             target="_blank"
                             rel="noopener noreferrer"
                             whileHover={{ scale: 1.05, backgroundColor: "#b8dd00" }}

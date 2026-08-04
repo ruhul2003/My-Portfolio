@@ -171,8 +171,8 @@ const Education = () => {
                                             key={item._id}
                                             layout
                                             variants={cardVariants}
-                                            whileHover={{ y: -6, borderColor: "rgba(101, 163, 13, 0.4)", backgroundColor: "rgba(255, 255, 255, 0.95)" }}
-                                            className="bg-white/90 dark:bg-zinc-900/10 backdrop-blur-sm border border-slate-200 dark:border-[#C4F000]/20 p-6 sm:p-8 rounded-3xl flex flex-col justify-between group transition-all duration-300 relative shadow-sm"
+                                            whileHover={{ y: -6 }}
+                                            className="bg-white/90 dark:bg-zinc-900/10 hover:bg-white dark:hover:bg-zinc-900/30 backdrop-blur-sm border border-slate-200 dark:border-[#C4F000]/20 hover:border-[#65a30d]/40 dark:hover:border-[#C4F000]/40 p-6 sm:p-8 rounded-3xl flex flex-col justify-between group transition-all duration-300 relative shadow-sm"
                                         >
                                             <div>
                                                 <div className="flex justify-between items-center">
@@ -258,8 +258,8 @@ const Education = () => {
                                         key={cert._id}
                                         layout
                                         variants={cardVariants}
-                                        whileHover={{ y: -6, borderColor: "rgba(101, 163, 13, 0.4)", backgroundColor: "rgba(255, 255, 255, 0.95)" }}
-                                        className="bg-white/90 dark:bg-zinc-900/10 backdrop-blur-sm border border-slate-200 dark:border-[#C4F000]/20 p-6 sm:p-8 rounded-3xl flex flex-col justify-between group transition-all duration-300 relative shadow-sm"
+                                        whileHover={{ y: -6 }}
+                                        className="bg-white/90 dark:bg-zinc-900/10 hover:bg-white dark:hover:bg-zinc-900/30 backdrop-blur-sm border border-slate-200 dark:border-[#C4F000]/20 hover:border-[#65a30d]/40 dark:hover:border-[#C4F000]/40 p-6 sm:p-8 rounded-3xl flex flex-col justify-between group transition-all duration-300 relative shadow-sm"
                                     >
                                         <div>
                                             <div className="flex justify-between items-start">
