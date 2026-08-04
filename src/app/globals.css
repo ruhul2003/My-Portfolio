@@ -172,3 +172,8 @@ html, body {
 .animate-marquee:hover {
   animation-play-state: paused;
 }
+
+/* Light mode logo inversion for contrast */
+html.light .logo-img {
+  filter: invert(1) hue-rotate(180deg) brightness(0.8);
+}

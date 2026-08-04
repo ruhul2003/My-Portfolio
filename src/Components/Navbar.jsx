@@ -59,17 +59,15 @@ const Navbar = () => {
                 {/* Logo - Link to Home */}
                 <Link href="/" className="flex items-center gap-2 group">
                     <div className="relative w-8 h-8 md:w-10 md:h-10 overflow-hidden rounded-xl border border-white/10 bg-zinc-950 flex items-center justify-center transition-transform group-hover:scale-105">
-                        <Image 
-                            src="/assets/logo.png" 
-                            alt="RA Logo" 
-                            width={40} 
-                            height={40} 
-                            className="object-contain w-full h-full"
+                        <Image
+                            src="/assets/logo.png"
+                            alt="RA Logo"
+                            width={40}
+                            height={40}
+                            className="object-contain w-full h-full logo-img"
                         />
                     </div>
-                    <span className="text-2xl md:text-3xl font-extrabold text-[#C4F000] tracking-tight group-hover:opacity-90 transition-opacity">
-                        Ruhul.
-                    </span>
+
                 </Link>
 
                 {/* Desktop Menu */}
