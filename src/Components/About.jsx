@@ -78,8 +78,8 @@ const About = () => {
                     <motion.div
                         key={index}
                         variants={itemVariants}
-                        whileHover={{ y: -6, borderColor: "rgba(196, 240, 0, 0.4)", backgroundColor: "rgba(255, 255, 255, 0.02)" }}
-                        className="flex flex-col items-center md:items-start text-center md:text-left p-6 rounded-2xl border border-slate-300 dark:border-zinc-800/40 bg-white/80 dark:bg-zinc-900/10 backdrop-blur-sm transition-colors duration-300 shadow-sm"
+                        whileHover={{ y: -6 }}
+                        className="flex flex-col items-center md:items-start text-center md:text-left p-6 rounded-2xl border border-slate-300 dark:border-zinc-800/40 bg-white/80 dark:bg-zinc-900/10 hover:bg-white dark:hover:bg-zinc-900/30 hover:border-[#65a30d]/40 dark:hover:border-[#C4F000]/40 backdrop-blur-sm transition-all duration-300 shadow-sm"
                     >
                         <h2 className="text-[#65a30d] dark:text-[#C4F000] font-extrabold text-5xl tracking-tight">{stat.number}</h2>
                         <p className="text-[14px] md:text-[15px] text-slate-700 dark:text-[#B4B4B4] mt-2 font-medium">{stat.label}</p>
@@ -150,12 +150,8 @@ const About = () => {
                         <motion.div
                             key={index}
                             variants={itemVariants}
-                            whileHover={{ 
-                                y: -6, 
-                                borderColor: "rgba(101, 163, 13, 0.4)", 
-                                backgroundColor: "rgba(255, 255, 255, 0.9)" 
-                            }}
-                            className="p-6 rounded-2xl border border-slate-300 dark:border-zinc-800/40 bg-white/80 dark:bg-zinc-900/5 backdrop-blur-sm transition-all duration-300 shadow-sm"
+                            whileHover={{ y: -6 }}
+                            className="p-6 rounded-2xl border border-slate-300 dark:border-zinc-800/40 bg-white/80 dark:bg-zinc-900/5 hover:bg-white dark:hover:bg-zinc-900/30 hover:border-[#65a30d]/40 dark:hover:border-[#C4F000]/40 backdrop-blur-sm transition-all duration-300 shadow-sm"
                         >
                             <h4 className="text-[#65a30d] dark:text-[#C4F000] font-bold text-lg tracking-tight">{p.title}</h4>
                             <p className="text-sm text-slate-700 dark:text-gray-400 mt-3 font-light leading-relaxed">{p.desc}</p>
