@@ -15,7 +15,7 @@ const Projects = () => {
     const [currentImgIndex, setCurrentImgIndex] = useState(0);
     const [selectedCategory, setSelectedCategory] = useState('All');
     const [currentPage, setCurrentPage] = useState(1);
-    const PROJECTS_PER_PAGE = 6;
+    const PROJECTS_PER_PAGE = 4;
     const router = useRouter();
 
     // Fetch projects and admin status
