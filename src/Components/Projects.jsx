@@ -14,6 +14,8 @@ const Projects = () => {
     const [selectedProject, setSelectedProject] = useState(null);
     const [currentImgIndex, setCurrentImgIndex] = useState(0);
     const [selectedCategory, setSelectedCategory] = useState('All');
+    const [currentPage, setCurrentPage] = useState(1);
+    const PROJECTS_PER_PAGE = 6;
     const router = useRouter();
 
     // Fetch projects and admin status
@@ -83,8 +85,15 @@ const Projects = () => {
         ? projects
         : projects.filter(p => (p.category || 'Other') === selectedCategory);
 
+    // Pagination calculations
+    const totalPages = Math.ceil(filteredProjects.length / PROJECTS_PER_PAGE);
+    const paginatedProjects = filteredProjects.slice(
+        (currentPage - 1) * PROJECTS_PER_PAGE,
+        currentPage * PROJECTS_PER_PAGE
+    );
+
     return (
-        <div className="min-h-screen w-full mt-20 mx-auto bg-slate-50 dark:bg-[#0a0a0a] py-16 transition-colors duration-300">
+        <div id="projects" className="min-h-screen w-full mt-20 mx-auto bg-slate-50 dark:bg-[#0a0a0a] py-16 transition-colors duration-300">
             {/* Header / Intro */}
             <div className="w-9/12 mx-auto mb-16 flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
                 <div>
@@ -113,7 +122,7 @@ const Projects = () => {
                     {categories.map((cat) => (
                         <button
                             key={cat}
-                            onClick={() => setSelectedCategory(cat)}
+                            onClick={() => { setSelectedCategory(cat); setCurrentPage(1); }}
                             className={`px-5 py-2 rounded-full font-bold transition-all text-xs sm:text-sm whitespace-nowrap flex items-center gap-1.5 cursor-pointer ${
                                 selectedCategory === cat
                                     ? 'text-white bg-[#65a30d] dark:text-black dark:bg-[#C4F000] shadow-lg shadow-[#65a30d]/20 scale-105'
@@ -139,12 +148,13 @@ const Projects = () => {
                         <p className="text-xl">No projects found in this category.</p>
                     </div>
                 ) : (
-                    <motion.div
-                        layout
-                        className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-10"
-                    >
-                        <AnimatePresence mode="popLayout">
-                            {filteredProjects.map((project) => (
+                    <>
+                        <motion.div
+                            layout
+                            className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-10"
+                        >
+                            <AnimatePresence mode="popLayout">
+                            {paginatedProjects.map((project) => (
                                 <motion.div
                                     key={project._id}
                                     layout
@@ -236,7 +246,56 @@ const Projects = () => {
                                 </motion.div>
                             ))}
                         </AnimatePresence>
-                    </motion.div>
+                        </motion.div>
+
+                        {/* Pagination Controls */}
+                        {totalPages > 1 && (
+                            <div className="flex justify-center items-center gap-2 mt-16 sm:mt-20">
+                                <button
+                                    onClick={() => {
+                                        setCurrentPage(prev => Math.max(prev - 1, 1));
+                                        document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth' });
+                                    }}
+                                    disabled={currentPage === 1}
+                                    className="p-3 rounded-full border border-slate-300 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-slate-700 dark:text-gray-300 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-50 dark:hover:bg-zinc-800/50 transition-all hover:scale-105 cursor-pointer flex items-center justify-center"
+                                    aria-label="Previous Page"
+                                >
+                                    <FaChevronLeft className="text-xs" />
+                                </button>
+
+                                <div className="flex items-center gap-1.5">
+                                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
+                                        <button
+                                            key={pageNum}
+                                            onClick={() => {
+                                                setCurrentPage(pageNum);
+                                                document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth' });
+                                            }}
+                                            className={`w-10 h-10 rounded-full font-bold transition-all text-sm flex items-center justify-center cursor-pointer ${
+                                                currentPage === pageNum
+                                                    ? 'bg-[#65a30d] text-white dark:bg-[#C4F000] dark:text-black shadow-lg shadow-[#65a30d]/20 scale-105'
+                                                    : 'text-slate-700 bg-white border border-slate-300 dark:text-gray-400 dark:bg-zinc-900 dark:border-zinc-800 hover:text-slate-900 dark:hover:text-white hover:border-slate-400 dark:hover:border-zinc-700'
+                                            }`}
+                                        >
+                                            {pageNum}
+                                        </button>
+                                    ))}
+                                </div>
+
+                                <button
+                                    onClick={() => {
+                                        setCurrentPage(prev => Math.min(prev + 1, totalPages));
+                                        document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth' });
+                                    }}
+                                    disabled={currentPage === totalPages}
+                                    className="p-3 rounded-full border border-slate-300 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-slate-700 dark:text-gray-300 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-50 dark:hover:bg-zinc-800/50 transition-all hover:scale-105 cursor-pointer flex items-center justify-center"
+                                    aria-label="Next Page"
+                                >
+                                    <FaChevronRight className="text-xs" />
+                                </button>
+                            </div>
+                        )}
+                    </>
                 )}
             </div>
 
