@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaTrash, FaEdit, FaPlus, FaSignOutAlt, FaImage, FaTimes, FaGlobe, FaBriefcase, FaAward, FaCertificate, FaArrowUp, FaArrowDown, FaTag } from 'react-icons/fa';
+import { FaTrash, FaEdit, FaPlus, FaSignOutAlt, FaImage, FaTimes, FaGlobe, FaBriefcase, FaAward, FaCertificate, FaArrowUp, FaArrowDown, FaTag, FaUser, FaSave } from 'react-icons/fa';
 
 function AdminDashboardContent() {
     const router = useRouter();
@@ -53,6 +53,20 @@ function AdminDashboardContent() {
     const [certDescription, setCertDescription] = useState('');
     const [certOrder, setCertOrder] = useState(0);
 
+    // About Me Form Fields State
+    const [aboutLoading, setAboutLoading] = useState(false);
+    const [aboutSaving, setAboutSaving] = useState(false);
+    const [aboutSuccess, setAboutSuccess] = useState('');
+    const [aboutError, setAboutError] = useState('');
+
+    const [aboutShortIntro, setAboutShortIntro] = useState('');
+    const [aboutStats, setAboutStats] = useState([]);
+    const [aboutBioPrefix, setAboutBioPrefix] = useState('');
+    const [aboutBioHighlight, setAboutBioHighlight] = useState('');
+    const [aboutBioSuffix, setAboutBioSuffix] = useState('');
+    const [aboutBioParagraphs, setAboutBioParagraphs] = useState([]);
+    const [aboutPrinciples, setAboutPrinciples] = useState([]);
+
     const fileInputRef = useRef(null);
 
     // Verify auth status & Load initial data
@@ -69,7 +83,8 @@ function AdminDashboardContent() {
                     await Promise.all([
                         fetchProjects(), 
                         fetchEducation(),
-                        fetchCertifications()
+                        fetchCertifications(),
+                        fetchAbout()
                     ]);
                 }
             } catch (err) {
@@ -82,7 +97,7 @@ function AdminDashboardContent() {
     // Handle initial tab / query params for edit
     useEffect(() => {
         const tabParam = searchParams.get('tab');
-        if (tabParam === 'education' || tabParam === 'certifications') {
+        if (tabParam === 'education' || tabParam === 'certifications' || tabParam === 'about') {
             setActiveTab(tabParam);
         } else {
             setActiveTab('projects');
@@ -136,6 +151,64 @@ function AdminDashboardContent() {
             if (data.success) setCertificationItems(data.data);
         } catch (err) {
             console.error("Error fetching certifications:", err);
+        }
+    };
+
+    const fetchAbout = async () => {
+        try {
+            setAboutLoading(true);
+            const res = await fetch('/api/about');
+            const data = await res.json();
+            if (data.success && data.data) {
+                setAboutShortIntro(data.data.shortIntro || '');
+                setAboutStats(data.data.stats || []);
+                setAboutBioPrefix(data.data.bioHeadingPrefix || '');
+                setAboutBioHighlight(data.data.bioHeadingHighlight || '');
+                setAboutBioSuffix(data.data.bioHeadingSuffix || '');
+                setAboutBioParagraphs(data.data.bioParagraphs || []);
+                setAboutPrinciples(data.data.principles || []);
+            }
+        } catch (err) {
+            console.error("Error fetching about data:", err);
+        } finally {
+            setAboutLoading(false);
+        }
+    };
+
+    const handleSaveAbout = async (e) => {
+        e.preventDefault();
+        setAboutSaving(true);
+        setAboutSuccess('');
+        setAboutError('');
+
+        try {
+            const payload = {
+                shortIntro: aboutShortIntro,
+                stats: aboutStats,
+                bioHeadingPrefix: aboutBioPrefix,
+                bioHeadingHighlight: aboutBioHighlight,
+                bioHeadingSuffix: aboutBioSuffix,
+                bioParagraphs: aboutBioParagraphs,
+                principles: aboutPrinciples
+            };
+
+            const res = await fetch('/api/about', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            const data = await res.json();
+            if (data.success) {
+                setAboutSuccess('About Me section updated successfully!');
+                setTimeout(() => setAboutSuccess(''), 4000);
+            } else {
+                setAboutError(data.message || 'Failed to update About Me section.');
+            }
+        } catch (err) {
+            setAboutError(err.message || 'An error occurred while saving.');
+        } finally {
+            setAboutSaving(false);
         }
     };
 
@@ -523,9 +596,9 @@ function AdminDashboardContent() {
                             onClick={() => {
                                 if (activeTab === 'projects') openProjectAddModal();
                                 else if (activeTab === 'education') openEducationAddModal();
-                                else openCertificationAddModal();
+                                else if (activeTab === 'certifications') openCertificationAddModal();
                             }}
-                            className="bg-[#C4F000] hover:bg-[#b8dd00] text-black px-5 py-2.5 rounded-full font-bold text-sm transition-all hover:scale-105 flex items-center gap-2"
+                            className={`bg-[#C4F000] hover:bg-[#b8dd00] text-black px-5 py-2.5 rounded-full font-bold text-sm transition-all hover:scale-105 flex items-center gap-2 ${activeTab === 'about' ? 'hidden' : ''}`}
                         >
                             <FaPlus /> Add {activeTab === 'projects' ? 'Project' : activeTab === 'education' ? 'Timeline Entry' : 'Credential'}
                         </button>
@@ -564,6 +637,15 @@ function AdminDashboardContent() {
                     >
                         <span className="flex items-center gap-2"><FaAward /> Certifications & Awards ({certificationItems.length})</span>
                         {activeTab === 'certifications' && (
+                            <motion.div layoutId="active_tab_indicator" className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#C4F000]" />
+                        )}
+                    </button>
+                    <button
+                        onClick={() => handleTabChange('about')}
+                        className={`pb-4 px-2 font-bold transition-all relative ${activeTab === 'about' ? 'text-[#C4F000]' : 'text-gray-400 hover:text-white'}`}
+                    >
+                        <span className="flex items-center gap-2"><FaUser /> About Me</span>
+                        {activeTab === 'about' && (
                             <motion.div layoutId="active_tab_indicator" className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#C4F000]" />
                         )}
                     </button>
@@ -713,6 +795,221 @@ function AdminDashboardContent() {
                                 </div>
                             )}
                         </div>
+                    )}
+
+                    {activeTab === 'about' && (
+                        /* ABOUT ME TAB */
+                        <form onSubmit={handleSaveAbout} className="space-y-8">
+                            <div className="flex flex-wrap justify-between items-center pb-4 border-b border-zinc-800 gap-4">
+                                <div>
+                                    <h2 className="text-xl font-bold text-white">Manage About Me Information</h2>
+                                    <p className="text-xs text-gray-400 mt-1">Update your bio, experience counters, heading, and principles displayed on the About Me section.</p>
+                                </div>
+                                <button
+                                    type="submit"
+                                    disabled={aboutSaving}
+                                    className="bg-[#C4F000] hover:bg-[#b8dd00] text-black px-6 py-2.5 rounded-full font-bold text-sm transition-all flex items-center gap-2 disabled:opacity-50"
+                                >
+                                    <FaSave /> {aboutSaving ? 'Saving...' : 'Save About Me'}
+                                </button>
+                            </div>
+
+                            {aboutSuccess && (
+                                <div className="bg-green-950/40 border border-green-500/40 text-green-400 px-4 py-3 rounded-xl text-sm font-medium">
+                                    {aboutSuccess}
+                                </div>
+                            )}
+
+                            {aboutError && (
+                                <div className="bg-red-950/40 border border-red-500/40 text-red-400 px-4 py-3 rounded-xl text-sm font-medium">
+                                    {aboutError}
+                                </div>
+                            )}
+
+                            {/* 1. Short Intro */}
+                            <div className="space-y-2">
+                                <label className="block text-sm font-bold text-gray-200">Short Intro</label>
+                                <textarea
+                                    rows={3}
+                                    value={aboutShortIntro}
+                                    onChange={(e) => setAboutShortIntro(e.target.value)}
+                                    className="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-[#C4F000]"
+                                    placeholder="Short summary displayed at top of About page..."
+                                />
+                            </div>
+
+                            {/* 2. Stats / Counters */}
+                            <div className="space-y-4 pt-4 border-t border-zinc-850">
+                                <div className="flex justify-between items-center">
+                                    <label className="block text-sm font-bold text-gray-200">Stats / Experience Counters</label>
+                                    <button
+                                        type="button"
+                                        onClick={() => setAboutStats([...aboutStats, { number: '', label: '' }])}
+                                        className="text-xs bg-zinc-800 hover:bg-zinc-700 text-[#C4F000] px-3 py-1.5 rounded-lg font-semibold flex items-center gap-1.5"
+                                    >
+                                        <FaPlus /> Add Stat
+                                    </button>
+                                </div>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    {aboutStats.map((stat, idx) => (
+                                        <div key={idx} className="bg-zinc-900/60 border border-zinc-800 p-4 rounded-xl space-y-3 relative group">
+                                            <div className="flex items-center justify-between">
+                                                <span className="text-xs text-gray-400 font-mono">Counter #{idx + 1}</span>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setAboutStats(aboutStats.filter((_, i) => i !== idx))}
+                                                    className="text-gray-500 hover:text-red-400 text-xs p-1"
+                                                >
+                                                    <FaTrash />
+                                                </button>
+                                            </div>
+                                            <div className="grid grid-cols-3 gap-2">
+                                                <input
+                                                    type="text"
+                                                    value={stat.number}
+                                                    onChange={(e) => setAboutStats(aboutStats.map((s, i) => i === idx ? { ...s, number: e.target.value } : s))}
+                                                    className="bg-zinc-950 border border-zinc-800 rounded-lg p-2 text-sm text-white font-bold focus:outline-none focus:border-[#C4F000]"
+                                                    placeholder="3+"
+                                                />
+                                                <input
+                                                    type="text"
+                                                    value={stat.label}
+                                                    onChange={(e) => setAboutStats(aboutStats.map((s, i) => i === idx ? { ...s, label: e.target.value } : s))}
+                                                    className="col-span-2 bg-zinc-950 border border-zinc-800 rounded-lg p-2 text-sm text-white focus:outline-none focus:border-[#C4F000]"
+                                                    placeholder="Years of Experience"
+                                                />
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* 3. Bio Callout Heading */}
+                            <div className="space-y-4 pt-4 border-t border-zinc-850">
+                                <label className="block text-sm font-bold text-gray-200">Bio Callout Heading</label>
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <div>
+                                        <span className="text-xs text-gray-400 block mb-1">Prefix Text</span>
+                                        <input
+                                            type="text"
+                                            value={aboutBioPrefix}
+                                            onChange={(e) => setAboutBioPrefix(e.target.value)}
+                                            className="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-[#C4F000]"
+                                            placeholder="A Passionate"
+                                        />
+                                    </div>
+                                    <div>
+                                        <span className="text-xs text-gray-400 block mb-1">Highlighted Text (Green)</span>
+                                        <input
+                                            type="text"
+                                            value={aboutBioHighlight}
+                                            onChange={(e) => setAboutBioHighlight(e.target.value)}
+                                            className="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-3 text-sm text-[#C4F000] font-semibold focus:outline-none focus:border-[#C4F000]"
+                                            placeholder="Web Designer"
+                                        />
+                                    </div>
+                                    <div>
+                                        <span className="text-xs text-gray-400 block mb-1">Suffix Text</span>
+                                        <input
+                                            type="text"
+                                            value={aboutBioSuffix}
+                                            onChange={(e) => setAboutBioSuffix(e.target.value)}
+                                            className="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-[#C4F000]"
+                                            placeholder="Turning Ideas Into Websites."
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* 4. Bio Paragraphs */}
+                            <div className="space-y-4 pt-4 border-t border-zinc-850">
+                                <div className="flex justify-between items-center">
+                                    <label className="block text-sm font-bold text-gray-200">Bio Paragraphs</label>
+                                    <button
+                                        type="button"
+                                        onClick={() => setAboutBioParagraphs([...aboutBioParagraphs, ''])}
+                                        className="text-xs bg-zinc-800 hover:bg-zinc-700 text-[#C4F000] px-3 py-1.5 rounded-lg font-semibold flex items-center gap-1.5"
+                                    >
+                                        <FaPlus /> Add Paragraph
+                                    </button>
+                                </div>
+                                <div className="space-y-3">
+                                    {aboutBioParagraphs.map((para, idx) => (
+                                        <div key={idx} className="flex gap-3 items-start">
+                                            <textarea
+                                                rows={3}
+                                                value={para}
+                                                onChange={(e) => setAboutBioParagraphs(aboutBioParagraphs.map((p, i) => i === idx ? e.target.value : p))}
+                                                className="flex-1 bg-zinc-900 border border-zinc-800 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-[#C4F000]"
+                                                placeholder={`Paragraph ${idx + 1}...`}
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={() => setAboutBioParagraphs(aboutBioParagraphs.filter((_, i) => i !== idx))}
+                                                className="text-gray-500 hover:text-red-400 p-2.5 bg-zinc-900 border border-zinc-800 rounded-xl"
+                                            >
+                                                <FaTrash />
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* 5. Core Principles */}
+                            <div className="space-y-4 pt-4 border-t border-zinc-850">
+                                <div className="flex justify-between items-center">
+                                    <label className="block text-sm font-bold text-gray-200">Focus & Core Principles</label>
+                                    <button
+                                        type="button"
+                                        onClick={() => setAboutPrinciples([...aboutPrinciples, { title: '', desc: '' }])}
+                                        className="text-xs bg-zinc-800 hover:bg-zinc-700 text-[#C4F000] px-3 py-1.5 rounded-lg font-semibold flex items-center gap-1.5"
+                                    >
+                                        <FaPlus /> Add Principle
+                                    </button>
+                                </div>
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    {aboutPrinciples.map((principle, idx) => (
+                                        <div key={idx} className="bg-zinc-900/60 border border-zinc-800 p-4 rounded-xl space-y-3 relative">
+                                            <div className="flex items-center justify-between">
+                                                <span className="text-xs text-gray-400 font-mono">Principle #{idx + 1}</span>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setAboutPrinciples(aboutPrinciples.filter((_, i) => i !== idx))}
+                                                    className="text-gray-500 hover:text-red-400 text-xs p-1"
+                                                >
+                                                    <FaTrash />
+                                                </button>
+                                            </div>
+                                            <input
+                                                type="text"
+                                                value={principle.title}
+                                                onChange={(e) => setAboutPrinciples(aboutPrinciples.map((p, i) => i === idx ? { ...p, title: e.target.value } : p))}
+                                                className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-2 text-sm text-white font-bold focus:outline-none focus:border-[#C4F000]"
+                                                placeholder="Title (e.g. Performance First)"
+                                            />
+                                            <textarea
+                                                rows={3}
+                                                value={principle.desc}
+                                                onChange={(e) => setAboutPrinciples(aboutPrinciples.map((p, i) => i === idx ? { ...p, desc: e.target.value } : p))}
+                                                className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-2 text-sm text-gray-300 focus:outline-none focus:border-[#C4F000]"
+                                                placeholder="Description..."
+                                            />
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Submit button */}
+                            <div className="pt-6 border-t border-zinc-800 flex justify-end">
+                                <button
+                                    type="submit"
+                                    disabled={aboutSaving}
+                                    className="bg-[#C4F000] hover:bg-[#b8dd00] text-black px-8 py-3 rounded-full font-bold text-sm transition-all flex items-center gap-2 disabled:opacity-50"
+                                >
+                                    <FaSave /> {aboutSaving ? 'Saving Changes...' : 'Save About Me'}
+                                </button>
+                            </div>
+                        </form>
                     )}
 
                 </div>
