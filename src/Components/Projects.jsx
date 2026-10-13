@@ -177,13 +177,13 @@ const Projects = () => {
                                 >
                                     <div>
                                         {/* Image Container */}
-                                        <div className="relative aspect-16/10 overflow-hidden bg-slate-100 dark:bg-black/40">
+                                        <div className="relative aspect-video overflow-hidden bg-slate-950 dark:bg-black flex items-center justify-center">
                                             <Image
                                                 src={project.images && project.images[0] ? (project.images[0].url || project.images[0]) : "/assets/p1.png"}
                                                 alt={project.title}
-                                                width={500}
-                                                height={320}
-                                                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                                width={1000}
+                                                height={563}
+                                                className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105"
                                             />
 
                                             {/* Category Badge */}
@@ -194,7 +194,7 @@ const Projects = () => {
                                             </div>
 
                                             {/* Hover Overlay */}
-                                            <div className="absolute inset-0 bg-linear-to-b from-transparent via-slate-900/30 to-slate-900/80 dark:via-black/30 dark:to-black/80 opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-end p-4">
+                                            <div className="absolute inset-0 bg-linear-to-b from-transparent via-slate-900/30 to-slate-900/80 dark:via-black/30 dark:to-black/80 opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-end p-4 pointer-events-none">
                                                 <span className="text-white dark:text-[#C4F000] font-semibold text-xs tracking-wider uppercase">View Project Details →</span>
                                             </div>
 
@@ -343,7 +343,7 @@ const Projects = () => {
                             {/* Scrollable Content Container */}
                             <div className="overflow-y-auto flex-1">
                                 {/* Carousel Section */}
-                                <div className="relative aspect-16/9 md:aspect-21/9 bg-slate-900 flex items-center justify-center group/carousel overflow-hidden">
+                                <div className="relative aspect-video max-h-[65vh] bg-slate-950 dark:bg-black flex items-center justify-center group/carousel overflow-hidden">
                                     <AnimatePresence mode="wait">
                                         <motion.img
                                             key={currentImgIndex}
@@ -353,7 +353,7 @@ const Projects = () => {
                                             animate={{ opacity: 1, x: 0 }}
                                             exit={{ opacity: 0, x: -50 }}
                                             transition={{ duration: 0.3 }}
-                                            className="w-full h-full object-cover"
+                                            className="w-full h-full object-contain"
                                         />
                                     </AnimatePresence>
 
