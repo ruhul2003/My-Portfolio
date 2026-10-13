@@ -15,7 +15,7 @@ const Projects = () => {
     const [currentImgIndex, setCurrentImgIndex] = useState(0);
     const [selectedCategory, setSelectedCategory] = useState('All');
     const [currentPage, setCurrentPage] = useState(1);
-    const PROJECTS_PER_PAGE = 4;
+    const PROJECTS_PER_PAGE = 6;
     const router = useRouter();
 
     // Fetch projects and admin status
@@ -92,6 +92,13 @@ const Projects = () => {
         currentPage * PROJECTS_PER_PAGE
     );
 
+    // Keep currentPage within valid bounds if projects or filter changes
+    useEffect(() => {
+        if (totalPages > 0 && currentPage > totalPages) {
+            setCurrentPage(totalPages);
+        }
+    }, [totalPages, currentPage]);
+
     return (
         <div id="projects" className="min-h-screen w-full mt-20 mx-auto bg-slate-50 dark:bg-[#0a0a0a] py-16 transition-colors duration-300">
             {/* Header / Intro */}
@@ -151,7 +158,7 @@ const Projects = () => {
                     <>
                         <motion.div
                             layout
-                            className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-10"
+                            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
                         >
                             <AnimatePresence mode="popLayout">
                             {paginatedProjects.map((project) => (
@@ -166,91 +173,96 @@ const Projects = () => {
                                         setSelectedProject(project);
                                         setCurrentImgIndex(0);
                                     }}
-                                    className="group relative cursor-pointer overflow-hidden rounded-3xl bg-white dark:bg-zinc-900 shadow-lg dark:shadow-xl border border-slate-200 dark:border-transparent transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl hover:border-slate-300 dark:hover:border-gray-700/60"
+                                    className="group relative cursor-pointer overflow-hidden rounded-2xl bg-white dark:bg-zinc-900 shadow-md dark:shadow-xl border border-slate-200 dark:border-zinc-800/80 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-2xl hover:border-slate-300 dark:hover:border-zinc-700 flex flex-col justify-between"
                                 >
-                                    {/* Image Container */}
-                                    <div className="relative aspect-16/10 overflow-hidden bg-slate-100 dark:bg-black/40">
-                                        <Image
-                                            src={project.images && project.images[0] ? (project.images[0].url || project.images[0]) : "/assets/p1.png"}
-                                            alt={project.title}
-                                            width={500}
-                                            height={500}
-                                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                                        />
+                                    <div>
+                                        {/* Image Container */}
+                                        <div className="relative aspect-16/10 overflow-hidden bg-slate-100 dark:bg-black/40">
+                                            <Image
+                                                src={project.images && project.images[0] ? (project.images[0].url || project.images[0]) : "/assets/p1.png"}
+                                                alt={project.title}
+                                                width={500}
+                                                height={320}
+                                                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                            />
 
-                                        {/* Category Badge */}
-                                        <div className="absolute top-4 left-4 z-20">
-                                            <span className="bg-white/90 dark:bg-black/80 backdrop-blur-md border border-slate-200 dark:border-zinc-700 text-[#65a30d] dark:text-[#C4F000] font-semibold text-xs px-3 py-1 rounded-full shadow-md flex items-center gap-1.5">
-                                                <FaTag className="text-[10px]" /> {project.category || 'Other'}
-                                            </span>
-                                        </div>
-
-                                        {/* Hover Overlay */}
-                                        <div className="absolute inset-0 bg-linear-to-b from-transparent via-slate-900/30 to-slate-900/80 dark:via-black/30 dark:to-black/80 opacity-0 group-hover:opacity-100 transition-all duration-500 flex items-end p-6">
-                                            <span className="text-white dark:text-[#C4F000] font-semibold text-sm tracking-wider uppercase">View Project Details →</span>
-                                        </div>
-
-                                        {/* Admin Action Buttons */}
-                                        {isAdmin && (
-                                            <div className="absolute top-4 right-4 flex gap-2 z-20">
-                                                <button
-                                                    onClick={(e) => handleEditRedirect(project._id, e)}
-                                                    className="p-3 bg-blue-600 hover:bg-blue-500 text-white rounded-full transition-all duration-200 hover:scale-110 shadow-md"
-                                                    title="Edit Project"
-                                                >
-                                                    <FaEdit className="text-sm" />
-                                                </button>
-                                                <button
-                                                    onClick={(e) => handleDelete(project._id, e)}
-                                                    className="p-3 bg-red-600 hover:bg-red-500 text-white rounded-full transition-all duration-200 hover:scale-110 shadow-md"
-                                                    title="Delete Project"
-                                                >
-                                                    <FaTrash className="text-sm" />
-                                                </button>
+                                            {/* Category Badge */}
+                                            <div className="absolute top-3 left-3 z-20">
+                                                <span className="bg-white/95 dark:bg-black/80 backdrop-blur-md border border-slate-200/90 dark:border-zinc-700/80 text-[#65a30d] dark:text-[#C4F000] font-semibold text-[11px] px-2.5 py-0.5 rounded-full shadow-xs flex items-center gap-1.5">
+                                                    <FaTag className="text-[9px]" /> {project.category || 'Other'}
+                                                </span>
                                             </div>
-                                        )}
+
+                                            {/* Hover Overlay */}
+                                            <div className="absolute inset-0 bg-linear-to-b from-transparent via-slate-900/30 to-slate-900/80 dark:via-black/30 dark:to-black/80 opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-end p-4">
+                                                <span className="text-white dark:text-[#C4F000] font-semibold text-xs tracking-wider uppercase">View Project Details →</span>
+                                            </div>
+
+                                            {/* Admin Action Buttons */}
+                                            {isAdmin && (
+                                                <div className="absolute top-3 right-3 flex gap-1.5 z-20">
+                                                    <button
+                                                        onClick={(e) => handleEditRedirect(project._id, e)}
+                                                        className="p-2 bg-blue-600 hover:bg-blue-500 text-white rounded-full transition-all duration-200 hover:scale-110 shadow-sm"
+                                                        title="Edit Project"
+                                                    >
+                                                        <FaEdit className="text-xs" />
+                                                    </button>
+                                                    <button
+                                                        onClick={(e) => handleDelete(project._id, e)}
+                                                        className="p-2 bg-red-600 hover:bg-red-500 text-white rounded-full transition-all duration-200 hover:scale-110 shadow-sm"
+                                                        title="Delete Project"
+                                                    >
+                                                        <FaTrash className="text-xs" />
+                                                    </button>
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        {/* Content */}
+                                        <div className="p-5">
+                                            <h3 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white mb-2 tracking-tight group-hover:text-[#65a30d] dark:group-hover:text-[#C4F000] transition-colors line-clamp-1">
+                                                {project.title}
+                                            </h3>
+                                            <p className="text-slate-600 dark:text-[#B4B4B4] text-xs sm:text-[13px] leading-relaxed mb-4 line-clamp-2">
+                                                {project.description}
+                                            </p>
+
+                                            {/* Technologies tags */}
+                                            {project.technologies && project.technologies.length > 0 && (
+                                                <div className="flex flex-wrap gap-1.5 mb-2">
+                                                    {project.technologies.slice(0, 3).map((tech, idx) => (
+                                                        <span key={idx} className="text-[11px] bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-gray-300 px-2.5 py-0.5 rounded-full border border-slate-200 dark:border-gray-700/30">
+                                                            {tech}
+                                                        </span>
+                                                    ))}
+                                                    {project.technologies.length > 3 && (
+                                                        <span className="text-[11px] bg-slate-100 dark:bg-zinc-800/40 text-slate-600 dark:text-gray-500 px-2 py-0.5 rounded-full border border-slate-200 dark:border-transparent">
+                                                            +{project.technologies.length - 3}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            )}
+                                        </div>
                                     </div>
 
-                                    {/* Content */}
-                                    <div className="p-8">
-                                        <h3 className="text-2xl font-semibold text-slate-900 dark:text-white mb-3 tracking-tight group-hover:text-[#65a30d] dark:group-hover:text-[#C4F000] transition-colors">
-                                            {project.title}
-                                        </h3>
-                                        <p className="text-slate-700 dark:text-[#B4B4B4] text-[15px] leading-relaxed mb-6 line-clamp-2">
-                                            {project.description}
-                                        </p>
-
-                                        {/* Technologies tags */}
-                                        {project.technologies && project.technologies.length > 0 && (
-                                            <div className="flex flex-wrap gap-2 mb-6">
-                                                {project.technologies.slice(0, 3).map((tech, idx) => (
-                                                    <span key={idx} className="text-xs bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-gray-300 px-3 py-1 rounded-full border border-slate-200 dark:border-gray-700/30">
-                                                        {tech}
-                                                    </span>
-                                                ))}
-                                                {project.technologies.length > 3 && (
-                                                    <span className="text-xs bg-slate-100 dark:bg-zinc-800/40 text-slate-600 dark:text-gray-500 px-2 py-1 rounded-full border border-slate-200 dark:border-transparent">
-                                                        +{project.technologies.length - 3} more
-                                                    </span>
-                                                )}
-                                            </div>
-                                        )}
-
-                                        <button
-                                            className="inline-flex items-center gap-2 text-sm font-medium text-slate-900 dark:text-white hover:text-[#65a30d] dark:hover:text-[#C4F000] transition-colors group/btn"
-                                        >
-                                            Explore Details
-                                            <span className="text-xl transition-transform group-hover/btn:translate-x-1">→</span>
-                                        </button>
+                                    {/* Card Footer */}
+                                    <div className="px-5 pb-5 pt-0">
+                                        <div className="pt-3 border-t border-slate-100 dark:border-zinc-800/80 flex items-center justify-between">
+                                            <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-700 dark:text-gray-300 group-hover:text-[#65a30d] dark:group-hover:text-[#C4F000] transition-colors">
+                                                Explore Details
+                                            </span>
+                                            <span className="text-sm text-slate-500 dark:text-gray-400 group-hover:text-[#65a30d] dark:group-hover:text-[#C4F000] transition-transform duration-300 group-hover:translate-x-1">→</span>
+                                        </div>
                                     </div>
                                 </motion.div>
                             ))}
-                        </AnimatePresence>
+                            </AnimatePresence>
                         </motion.div>
 
                         {/* Pagination Controls */}
                         {totalPages > 1 && (
-                            <div className="flex justify-center items-center gap-2 mt-16 sm:mt-20">
+                            <div className="flex justify-center items-center gap-2 mt-12 sm:mt-16">
                                 <button
                                     onClick={() => {
                                         setCurrentPage(prev => Math.max(prev - 1, 1));
